@@ -1893,7 +1893,11 @@ void RiggedObject::Load(const std::string& character_path, vec3 pos, SceneGraph*
 	    #ifdef __APPLE__
                 simd_bone_mats = (simd_mat4*)malloc(bytes_needed);
             #else
+              #ifdef __NetBSD__
+                simd_bone_mats = (simd_mat4*)aligned_alloc(16, bytes_needed);
+              #else
                 simd_bone_mats = (simd_mat4*)memalign(16, bytes_needed);
+              #endif
             #endif
         #endif
     #endif

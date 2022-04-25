@@ -5,6 +5,8 @@
 #include <stdio.h>
 #else
 
+#include <stdarg.h>
+
 #define PORTABLE_SNPRINTF_VERSION_MAJOR 2
 #define PORTABLE_SNPRINTF_VERSION_MINOR 2
 

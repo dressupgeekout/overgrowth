@@ -24,7 +24,7 @@
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Wpedantic"
 #endif
-#ifdef PLATFORM_LINUX
+#if defined(PLATFORM_LINUX) || defined(PLATFORM_NETBSD)
 #include <gtk/gtk.h>
 #endif
 #ifdef __GNUC__

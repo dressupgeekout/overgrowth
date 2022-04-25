@@ -267,12 +267,15 @@ IF(WIN32)
 ENDIF()
 
 IF(LINUX OR NETBSD)
-    FIND_PACKAGE(GTK2 REQUIRED)
     FIND_PACKAGE(SDL2 REQUIRED)
     FIND_PACKAGE(SDL2NET REQUIRED)
     FIND_PACKAGE(Freetype REQUIRED)
-    FIND_PACKAGE(OpenAL REQUIRED)
+
+    include(FindPkgConfig)
+    PKG_CHECK_MODULES(GTK2 REQUIRED gtk+-2.0)
+    PKG_CHECK_MODULES(OPENAL REQUIRED openal)
 ENDIF()
+
 
 #Build static libraries only for FFTW
 SET(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
@@ -726,7 +729,6 @@ IF(NETBSD)
     MESSAGE(STATUS "SDL2_INCLUDE_DIR: ${SDL2_INCLUDE_DIR}")
 
     INCLUDE_DIRECTORIES(
-        LinuxInclude
         ${GTK2_INCLUDE_DIRS}
         ${SDL2_INCLUDE_DIR}
         ${SDL2NET_INCLUDE_DIR}
@@ -1632,9 +1634,20 @@ IF(BUILD_OVERGROWTH)
 
     IF(LINUX)
         TARGET_LINK_LIBRARIES(Overgrowth
+            dl
+        )
+    ENDIF()
+
+    IF(LINUX OR NETBSD)
+        TARGET_INCLUDE_DIRECTORIES(Overgrowth PUBLIC
+          ${OPENAL_INCLUDE_DIRS}
+          ${GTK2_INCLUDE_DIRS}
+        )
+
+        TARGET_LINK_LIBRARIES(Overgrowth
             SDL2
             ${SDL2NET_LIBRARY}
-            openal
+            ${OPENAL_LIBRARIES}
             vorbisfile
             vorbis
             ogg
@@ -1647,7 +1660,6 @@ IF(BUILD_OVERGROWTH)
             jpeg
 	        #nvcore nvmath nvimage squish posh
             z
-            dl
             ${GTK2_LIBRARIES}
         )
 
