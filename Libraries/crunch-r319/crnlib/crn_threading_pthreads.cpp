@@ -12,7 +12,7 @@
 #include <process.h>
 #endif
 
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(__NetBSD__)
 #include <sys/sysctl.h>
 #include <fcntl.h>
 #elif defined(__GNUC__)
