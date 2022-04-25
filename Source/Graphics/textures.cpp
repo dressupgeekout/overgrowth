@@ -154,7 +154,7 @@ namespace {
 #ifdef _WIN32
 const char* worker_app_path = "OvergrowthWorker.exe";
 #endif
-#ifdef __APPLE__
+#if defined(_APPLE__) || defined(__NetBSD__)
 const char* worker_app_path = "OvergrowthWorker";
 #endif
 #ifdef __LINUX__
