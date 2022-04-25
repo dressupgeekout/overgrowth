@@ -1039,6 +1039,14 @@ IF(LINUX)
     )
 ENDIF()
 
+IF(NETBSD)
+    LIST(APPEND OVERGROWTH_INTERNAL_SRCS
+        ${SRCDIR}/Compat/NetBSD/netbsd_compat.cpp
+        ${SRCDIR}/Compat/NetBSD/netbsd_compat.h
+        ${SRCDIR}/Compat/Linux/os_dialogs_linux.cpp
+        ${SRCDIR}/Compat/Linux/linux_hardware_info.cpp
+    )
+ENDIF()
 
 IF(APPLE)
     LIST(APPEND OVERGROWTH_INTERNAL_SRCS 
@@ -1164,6 +1172,29 @@ SET(OVERGROWTHWORKER_SRCS
     ${SRCDIR}/Compat/processpool.cpp
     ${SRCDIR}/Compat/processpool.h
 )
+
+IF(UNIX)
+    LIST(APPEND OVERGROWTHWORKER_SRCS ${SRCDIR}/Compat/UNIX/unix_compat.cpp)
+    LIST(APPEND OVERGROWTHWORKER_SRCS ${SRCDIR}/Compat/UNIX/unix_compat.h)
+    LIST(APPEND OVERGROWTHWORKER_SRCS ${SRCDIR}/Compat/UNIX/unix_filepath.cpp)
+ENDIF()
+
+IF(APPLE)
+    LIST(APPEND OVERGROWTHWORKER_SRCS
+        ${SRCDIR}/Compat/Mac/mac_compat.mm
+        ${SRCDIR}/Compat/Mac/mac_compat.h
+    )
+ENDIF()
+
+IF(LINUX)
+    LIST(APPEND OVERGROWTHWORKER_SRCS ${SRCDIR}/Compat/Linux/linux_compat.cpp)
+    LIST(APPEND OVERGROWTHWORKER_SRCS ${SRCDIR}/Compat/Linux/linux_compat.h)
+ENDIF()
+
+IF(NETBSD)
+    LIST(APPEND OVERGROWTHWORKER_SRCS ${SRCDIR}/Compat/NetBSD/netbsd_compat.cpp)
+    LIST(APPEND OVERGROWTHWORKER_SRCS ${SRCDIR}/Compat/NetBSD/netbsd_compat.h)
+ENDIF()
 
 IF(WIN32)
     SET(WIN_RESOURCE_FILE icon.rc)
