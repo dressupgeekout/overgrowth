@@ -266,6 +266,7 @@ IF(LINUX OR NETBSD)
     include(FindPkgConfig)
     PKG_CHECK_MODULES(GTK2 REQUIRED gtk+-2.0)
     PKG_CHECK_MODULES(OPENAL REQUIRED openal)
+    PKG_CHECK_MODULES(LIBPNG REQUIRED libpng)
 ENDIF()
 
 
@@ -1478,10 +1479,17 @@ IF(BUILD_OVERGROWTH)
         )
     ENDIF()
 
+    IF(NETBSD)
+      TARGET_LINK_LIBRARIES(Overgrowth
+        jemalloc
+      )
+    ENDIF()
+
     IF(LINUX OR NETBSD)
         TARGET_INCLUDE_DIRECTORIES(Overgrowth PUBLIC
           ${OPENAL_INCLUDE_DIRS}
           ${GTK2_INCLUDE_DIRS}
+          ${LIBPNG_INCLUDE_DIRS}
         )
 
         TARGET_LINK_LIBRARIES(Overgrowth
@@ -1494,11 +1502,11 @@ IF(BUILD_OVERGROWTH)
             GL
             pthread
             bz2
-            png
             jpeg
 	        #nvcore nvmath nvimage squish posh
             z
-            ${GTK2_LIBRARIES}
+            ${GTK2_LDFLAGS}
+            ${LIBPNG_LIBRARIES}
         )
 
 	IF(ENABLE_STEAMWORKS)
