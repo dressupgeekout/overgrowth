@@ -28,7 +28,7 @@
 
 inline uint64_t getCPUTSC() {
     // Use rdtsc instruction to get the tsc or Time Stamp Counter
-#if (defined(PLATFORM_LINUX) || defined(PLATFORM_MACOSX)) && (defined(__i386__) || defined(__x86_64__))
+#if (defined(PLATFORM_LINUX) || defined(PLATFORM_NETBSD) || defined(PLATFORM_MACOSX)) && (defined(__i386__) || defined(__x86_64__))
     uint32_t rax, rdx;
     asm volatile ( "lfence" ::: "memory" ); //Fence memory load to everything is executed up to this point.
     asm volatile ( "rdtsc\n" : "=a" (rax), "=d" (rdx) : : );
