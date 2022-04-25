@@ -23,6 +23,8 @@
 //-----------------------------------------------------------------------------
 #include "error.h"
 
+#include <unistd.h> // for _exit()
+
 #include <Internal/config.h>
 #include <Internal/common.h>
 #include <Internal/modloading.h>
