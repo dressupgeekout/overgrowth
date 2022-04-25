@@ -1,6 +1,7 @@
 //-----------------------------------------------------------------------------
-//           Name: timing.h
+//           Name: netbsd_compat.cpp
 //      Developer: Wolfire Games LLC
+//         Author: Charlotte Koch
 //    Description:
 //        License: Read below
 //-----------------------------------------------------------------------------
@@ -20,32 +21,8 @@
 //   limitations under the License.
 //
 //-----------------------------------------------------------------------------
-#pragma once
 
-#include <Compat/platform.h>
-#if defined(PLATFORM_WINDOWS) && _MSC_VER >= 1600
-#include <intrin.h>
-#endif
-
-inline uint64_t getCPUTSC() {
-    // Use rdtsc instruction to get the tsc or Time Stamp Counter
-#if (defined(PLATFORM_LINUX) || defined(PLATFORM_NETBSD) || defined(PLATFORM_MACOSX)) && (defined(__i386__) || defined(__x86_64__))
-    uint32_t rax, rdx;
-    asm volatile("lfence" ::
-                     : "memory");  // Fence memory load to everything is executed up to this point.
-    asm volatile("rdtsc\n"
-                 : "=a"(rax), "=d"(rdx)
-                 :
-                 :);
-    return ((uint64_t)rdx << 32) + rax;
-#elif defined(PLATFORM_WINDOWS) && _MSC_VER >= 1600
-    unsigned __int64 i;
-    _ReadBarrier();
-    i = __rdtsc();
-    return (uint64_t)i;
-#else
-
-#error "No timer implementation for current target platform"
-
-#endif
+int os_copyfile( const char *source, const char *dest )
+{
+    return -1;
 }

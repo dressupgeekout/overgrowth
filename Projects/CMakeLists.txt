@@ -199,8 +199,11 @@ IF(APPLE)
 ENDIF()
 
 #define platform variables
-IF(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
+IF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     SET(LINUX TRUE)
+ENDIF()
+IF(CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
+    SET(NETBSD TRUE)
 ENDIF()
 
 if(LINUX)
@@ -251,7 +254,7 @@ IF(WIN32)
     ENDIF()
 ENDIF()
 
-IF(LINUX)
+IF(LINUX OR NETBSD)
     FIND_PACKAGE(GTK2 REQUIRED)
     FIND_PACKAGE(SDL2 REQUIRED)
     FIND_PACKAGE(SDL2NET REQUIRED)
@@ -375,6 +378,10 @@ IF(LINUX)
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -rdynamic -fno-omit-frame-pointer")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -rdynamic -fno-omit-frame-pointer")
 
+ENDIF()
+
+IF(NETBSD)
+  ADD_DEFINITIONS(-DPLATFORM_NETBSD=1)
 ENDIF()
 
 IF(APPLE)
@@ -648,6 +655,18 @@ IF(LINUX)
     ENDIF()
 ENDIF() 
 
+IF(NETBSD)
+    MESSAGE(STATUS "SDL2_INCLUDE_DIR: ${SDL2_INCLUDE_DIR}")
+
+    INCLUDE_DIRECTORIES(
+        LinuxInclude
+        ${GTK2_INCLUDE_DIRS}
+        ${SDL2_INCLUDE_DIR}
+        ${SDL2NET_INCLUDE_DIR}
+        /usr/pkg/include
+    )
+ENDIF() 
+
 if(WIN32)
     INCLUDE_DIRECTORIES(
       ${LIBDIR}/SDL2-2.0.20/include
@@ -858,6 +877,34 @@ IF(LINUX AND BUILD_OGDA) #Making Ogda linux only for now.
         ${SRCDIR}/Memory/*.cpp
         ${SRCDIR}/Memory/*.h
     )
+
+    IF(UNIX)
+        LIST(APPEND OGDA_SRCS
+            ${SRCDIR}/Compat/UNIX/unix_compat.cpp
+            ${SRCDIR}/Compat/UNIX/unix_compat.h
+        )
+    ENDIF()
+
+    IF(LINUX)
+        LIST(APPEND OGDA_SRCS
+            ${SRCDIR}/Compat/Linux/linux_compat.cpp
+            ${SRCDIR}/Compat/Linux/linux_compat.h
+        )
+    ENDIF()
+
+    IF(NETBSD)
+      LIST(APPEND OGDA_SRCS
+        ${SRCDIR}/Compat/NetBSD/netbsd_compat.cpp
+        ${SRCDIR}/Compat/NetBSD/netbsd_compat.h
+      )
+    ENDIF()
+
+    IF(APPLE)
+        LIST(APPEND OGDA_SRCS
+            ${SRCDIR}/Compat/Mac/mac_compat.mm
+            ${SRCDIR}/Compat/Mac/mac_compat.h
+        )
+    ENDIF()
 
     IF(WIN32)
         IF(MSVC_VERSION LESS 1911)
@@ -1125,6 +1172,12 @@ IF(BUILD_OVERGROWTH)
         COMPILE_DEFINITIONS OG_WORKER=1
     )
 
+    if(NETBSD)
+      SET_TARGET_PROPERTIES(OvergrowthWorker PROPERTIES 
+        LINK_DIRECTORIES /usr/pkg/lib
+      )
+    endif()
+
     TARGET_LINK_LIBRARIES(OvergrowthWorker
         OvergrowthCompat
         OvergrowthLogging
@@ -1133,6 +1186,12 @@ IF(BUILD_OVERGROWTH)
         glad
         crnlib
     )
+
+    if(NETBSD)
+      TARGET_LINK_LIBRARIES(OvergrowthWorker
+        jemalloc # for malloc_usable_size(3)
+      )
+    endif()
 
     IF(MSVC)
         ADD_COMPILE_OPTIONS(/permissive-)
