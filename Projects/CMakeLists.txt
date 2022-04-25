@@ -1191,6 +1191,17 @@ IF(LINUX)
     )
 ENDIF()
 
+IF(NETBSD)
+    LIST(APPEND OVERGROWTH_INTERNAL_SRCS
+        ${SRCDIR}/Compat/NetBSD/netbsd_compat.cpp
+        ${SRCDIR}/Compat/NetBSD/netbsd_compat.h
+        #${SRCDIR}/Compat/NetBSD/netbsd_time.cpp
+        #${SRCDIR}/Compat/NetBSD/os_dialogs_netbsd.cpp
+        ${SRCDIR}/Compat/Linux/os_dialogs_linux.cpp
+        ${SRCDIR}/Compat/Linux/linux_hardware_info.cpp
+        ${SRCDIR}/Compat/Linux/linux_time.cpp
+    )
+ENDIF()
 
 IF(APPLE)
     LIST(APPEND OVERGROWTH_INTERNAL_SRCS 
@@ -1347,6 +1358,11 @@ ENDIF()
 IF(LINUX)
     LIST(APPEND OVERGROWTHWORKER_SRCS ${SRCDIR}/Compat/Linux/linux_compat.cpp)
     LIST(APPEND OVERGROWTHWORKER_SRCS ${SRCDIR}/Compat/Linux/linux_compat.h)
+ENDIF()
+
+IF(NETBSD)
+    LIST(APPEND OVERGROWTHWORKER_SRCS ${SRCDIR}/Compat/NetBSD/netbsd_compat.cpp)
+    LIST(APPEND OVERGROWTHWORKER_SRCS ${SRCDIR}/Compat/NetBSD/netbsd_compat.h)
 ENDIF()
 
 IF(WIN32)
