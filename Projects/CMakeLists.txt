@@ -1388,9 +1388,6 @@ IF(BUILD_OVERGROWTH)
         COMPILE_DEFINITIONS OG_WORKER=1
     )
 
-    IF(NETBSD)
-    ENDIF()
-
     TARGET_LINK_LIBRARIES(OvergrowthWorker
         ${FREEIMAGE_LIBRARY}
         tinyxml
@@ -1400,9 +1397,9 @@ IF(BUILD_OVERGROWTH)
     )
 
     IF(NETBSD)
-      TARGET_LINK_LIBRARIES(OvergrowthWorker
-        jemalloc # for malloc_usable_size(3)
-      )
+        TARGET_LINK_LIBRARIES(OvergrowthWorker
+            jemalloc # for malloc_usable_size(3)
+        )
     endif()
 
     IF(MSVC)
@@ -1659,16 +1656,16 @@ IF(BUILD_OVERGROWTH)
     ENDIF()
 
     IF(NETBSD)
-      TARGET_LINK_LIBRARIES(Overgrowth
-        jemalloc
-      )
+        TARGET_LINK_LIBRARIES(Overgrowth
+            jemalloc # for malloc_usable_size(3)
+        )
     ENDIF()
 
     IF(LINUX OR NETBSD)
         TARGET_INCLUDE_DIRECTORIES(Overgrowth PUBLIC
-          ${OPENAL_INCLUDE_DIRS}
-          ${GTK2_INCLUDE_DIRS}
-          ${LIBPNG_INCLUDE_DIRS}
+            ${OPENAL_INCLUDE_DIRS}
+            ${GTK2_INCLUDE_DIRS}
+            ${LIBPNG_INCLUDE_DIRS}
         )
 
         TARGET_LINK_LIBRARIES(Overgrowth
