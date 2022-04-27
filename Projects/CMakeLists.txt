@@ -259,16 +259,24 @@ IF(WIN32)
 ENDIF()
 
 IF(LINUX OR NETBSD)
+    # Find with CMake files
     FIND_PACKAGE(SDL2 REQUIRED)
     FIND_PACKAGE(SDL2NET REQUIRED)
     FIND_PACKAGE(Freetype REQUIRED)
 
+    # Find with pkg-config
     include(FindPkgConfig)
     PKG_CHECK_MODULES(GTK2 REQUIRED gtk+-2.0)
     PKG_CHECK_MODULES(OPENAL REQUIRED openal)
     PKG_CHECK_MODULES(LIBPNG REQUIRED libpng)
-ENDIF()
 
+    # Find manually because they don't ship CMakeFiles nor *.pc files
+    FIND_LIBRARY(FREEIMAGE_LIBRARY
+      NAMES freeimage
+      PATHS /usr/lib /usr/pkg/lib
+      REQUIRED
+    )
+ENDIF()
 
 SET(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
@@ -670,7 +678,6 @@ IF(NETBSD)
         ${GTK2_INCLUDE_DIRS}
         ${SDL2_INCLUDE_DIR}
         ${SDL2NET_INCLUDE_DIR}
-        /usr/pkg/include
     )
 ENDIF() 
 
@@ -1210,11 +1217,8 @@ IF(BUILD_OVERGROWTH)
         COMPILE_DEFINITIONS OG_WORKER=1
     )
 
-    if(NETBSD)
-      SET_TARGET_PROPERTIES(OvergrowthWorker PROPERTIES 
-        LINK_DIRECTORIES /usr/pkg/lib
-      )
-    endif()
+    IF(NETBSD)
+    ENDIF()
 
     TARGET_LINK_LIBRARIES(OvergrowthWorker
         OvergrowthCompat
@@ -1225,7 +1229,7 @@ IF(BUILD_OVERGROWTH)
         crnlib
     )
 
-    if(NETBSD)
+    IF(NETBSD)
       TARGET_LINK_LIBRARIES(OvergrowthWorker
         jemalloc # for malloc_usable_size(3)
       )
