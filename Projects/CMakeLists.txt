@@ -592,8 +592,8 @@ IF(WIN32)
     LINK_DIRECTORIES(
         ${LIBDIR}/FreeImage/lib/${VERSION_DIR}/${WINDOWS_LIB_DIR}
         ${LIBDIR}/SDL2-2.0.20/lib/${WINDOWS_LIB_DIR}
-	${LIBDIR}/freetype-windows-binaries-2.12.0/release_dll/win64
-	${LIBDIR}/SDL2_net-2.0.1/lib/${WINDOWS_LIB_DIR}
+        ${LIBDIR}/freetype-windows-binaries-2.12.0/release_dll/win64
+        ${LIBDIR}/SDL2_net-2.0.1/lib/${WINDOWS_LIB_DIR}
         ${LIBDIR}/openal-soft-1.18.0-bin/libs/${WINDOWS_LIB_DIR}
         ${LIBDIR}/ogg/lib/${WINDOWS_LIB_DIR}
         ${LIBDIR}/vorbis/lib/${WINDOWS_LIB_DIR}
@@ -601,7 +601,7 @@ IF(WIN32)
         ${LIBDIR}/zlib1.2.7/lib/${WINDOWS_LIB_DIR}
         ${LIBDIR}/theora/lib/${WINDOWS_LIB_DIR}
         ${LIBDIR}/openvr-master/lib/win/${WINDOWS_LIB_DIR}
-	${LIBDIR}/breakpad/src/client/windows/lib/${WINDOWS_LIB_DIR}
+	    ${LIBDIR}/breakpad/src/client/windows/lib/${WINDOWS_LIB_DIR}
         ${LIBDIR}/xinput/Lib/x86
         ${LIBDIR}/NvToolsExt/lib/Win32
     )
@@ -671,6 +671,7 @@ INCLUDE_DIRECTORIES(
     ${SRCDIR}
     ${LIBDIR}
     ${LIBDIR}/imgui-1.85
+    ${LIBDIR}/imgui-1.85/misc/freetype
     ${LIBDIR}/ovr_sdk_win_1.12.0_public/OculusSDK/LibOVR/Include
     ${LIBDIR}/openvr-master/headers
     ${LIBDIR}/glm-0.9.4.2/
@@ -716,6 +717,7 @@ IF(LINUX)
         ${GTK2_INCLUDE_DIRS}
         ${SDL2_INCLUDE_DIR}
         ${SDL2NET_INCLUDE_DIR}
+        ${FREETYPE_INCLUDE_DIRS}
         ${LIBDIR}/Linux/include
         ${LIBDIR}/Linux/include/AL
         ${LIBDIR}/${FFTW_DIR}
