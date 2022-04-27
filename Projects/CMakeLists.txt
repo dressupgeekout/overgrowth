@@ -393,7 +393,8 @@ IF(LINUX)
 ENDIF()
 
 IF(NETBSD)
-  ADD_DEFINITIONS(-DPLATFORM_NETBSD=1)
+    ADD_DEFINITIONS(-DPLATFORM_NETBSD=1)
+    ADD_DEFINITIONS(${GTK2_DEFINITIONS})
 ENDIF()
 
 IF(APPLE)
@@ -675,7 +676,7 @@ IF(NETBSD)
         ${SDL2_INCLUDE_DIR}
         ${SDL2NET_INCLUDE_DIR}
     )
-ENDIF() 
+ENDIF()
 
 if(WIN32)
     INCLUDE_DIRECTORIES(
@@ -903,10 +904,10 @@ IF(LINUX AND BUILD_OGDA) #Making Ogda linux only for now.
     ENDIF()
 
     IF(NETBSD)
-      LIST(APPEND OGDA_SRCS
-        ${SRCDIR}/Compat/NetBSD/netbsd_compat.cpp
-        ${SRCDIR}/Compat/NetBSD/netbsd_compat.h
-      )
+        LIST(APPEND OGDA_SRCS
+            ${SRCDIR}/Compat/NetBSD/netbsd_compat.cpp
+            ${SRCDIR}/Compat/NetBSD/netbsd_compat.h
+        )
     ENDIF()
 
     IF(APPLE)
@@ -1213,9 +1214,6 @@ IF(BUILD_OVERGROWTH)
         COMPILE_DEFINITIONS OG_WORKER=1
     )
 
-    IF(NETBSD)
-    ENDIF()
-
     TARGET_LINK_LIBRARIES(OvergrowthWorker
         OvergrowthCompat
         OvergrowthLogging
@@ -1226,9 +1224,9 @@ IF(BUILD_OVERGROWTH)
     )
 
     IF(NETBSD)
-      TARGET_LINK_LIBRARIES(OvergrowthWorker
-        jemalloc # for malloc_usable_size(3)
-      )
+        TARGET_LINK_LIBRARIES(OvergrowthWorker
+            jemalloc # for malloc_usable_size(3)
+        )
     endif()
 
     IF(MSVC)
@@ -1511,16 +1509,16 @@ IF(BUILD_OVERGROWTH)
     ENDIF()
 
     IF(NETBSD)
-      TARGET_LINK_LIBRARIES(Overgrowth
-        jemalloc
-      )
+        TARGET_LINK_LIBRARIES(Overgrowth
+            jemalloc # for malloc_usable_size(3)
+        )
     ENDIF()
 
     IF(LINUX OR NETBSD)
         TARGET_INCLUDE_DIRECTORIES(Overgrowth PUBLIC
-          ${OPENAL_INCLUDE_DIRS}
-          ${GTK2_INCLUDE_DIRS}
-          ${LIBPNG_INCLUDE_DIRS}
+            ${OPENAL_INCLUDE_DIRS}
+            ${GTK2_INCLUDE_DIRS}
+            ${LIBPNG_INCLUDE_DIRS}
         )
 
         TARGET_LINK_LIBRARIES(Overgrowth
