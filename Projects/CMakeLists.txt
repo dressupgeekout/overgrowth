@@ -439,8 +439,8 @@ IF(LINUX)
 ENDIF()
 
 IF(NETBSD)
-  ADD_DEFINITIONS(-DPLATFORM_NETBSD=1)
-  ADD_DEFINITIONS(${GTK2_DEFINITIONS})
+    ADD_DEFINITIONS(-DPLATFORM_NETBSD=1)
+    ADD_DEFINITIONS(${GTK2_DEFINITIONS})
 ENDIF()
 
 IF(APPLE)
@@ -743,7 +743,7 @@ IF(NETBSD)
         ${SDL2_INCLUDE_DIR}
         ${SDL2NET_INCLUDE_DIR}
     )
-ENDIF() 
+ENDIF()
 
 if(WIN32)
     INCLUDE_DIRECTORIES(
@@ -921,10 +921,10 @@ IF(LINUX AND BUILD_OGDA) #Making Ogda linux only for now.
     ENDIF()
 
     IF(NETBSD)
-      LIST(APPEND OGDA_SRCS
-        ${SRCDIR}/Compat/NetBSD/netbsd_compat.cpp
-        ${SRCDIR}/Compat/NetBSD/netbsd_compat.h
-      )
+        LIST(APPEND OGDA_SRCS
+            ${SRCDIR}/Compat/NetBSD/netbsd_compat.cpp
+            ${SRCDIR}/Compat/NetBSD/netbsd_compat.h
+        )
     ENDIF()
 
     IF(APPLE)
