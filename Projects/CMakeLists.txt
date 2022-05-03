@@ -235,7 +235,6 @@ if(LINUX)
         SET(ARCH_OUT "amd64")
         SET(TOOL_BIN_NAME "bin64")
         set_property(GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS ON)
-        ADD_DEFINITIONS(-DPLATFORM_64=1)
     ELSE()
         SET(LIB_SUFFIX "lib")
         SET(BIN_SUFFIX ".bin.x86")
@@ -246,7 +245,6 @@ if(LINUX)
         ### Ensure LargeFileSupport on 32bit linux
         set(CMAKE_C_FLAGS           "${CMAKE_C_FLAGS} -D_FILE_OFFSET_BITS=64")
         set(CMAKE_CXX_FLAGS         "${CMAKE_CXX_FLAGS} -D_FILE_OFFSET_BITS=64")
-        ADD_DEFINITIONS(-DPLATFORM_32=1)
     ENDIF()
 endif()
 
@@ -423,11 +421,7 @@ ELSE()
 ENDIF()
 
 # Add preprocessor definitions so that the code can use platform #ifdefs
-IF(UNIX)
-    ADD_DEFINITIONS(-DPLATFORM_UNIX=1)
-ENDIF()
 IF(LINUX)
-    ADD_DEFINITIONS(-DPLATFORM_LINUX=1)
     ADD_DEFINITIONS(${GTK2_DEFINITIONS})
 
     #-no-strict-aliasing for the sake of angelscript
@@ -444,7 +438,6 @@ IF(NETBSD)
 ENDIF()
 
 IF(APPLE)
-    ADD_DEFINITIONS(-DPLATFORM_MACOSX=1)
     #-no-strict-aliasing for the sake of angelscript
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-strict-aliasing")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -fno-strict-aliasing")
@@ -467,7 +460,6 @@ SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG")
 #enable .pdb symbol generation for Release target on Windows
 IF(WIN32) 
     #Disable warnings when using standard c functions in visual studio
-    ADD_DEFINITIONS(-DPLATFORM_WINDOWS=1)
     ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /GF -D_CRT_SECURE_NO_WARNINGS -DNEED_SNPRINTF_ONLY /EHsc")
@@ -660,6 +652,7 @@ ADD_DEFINITIONS(
     -DHAVE_MIXCFG_H
     -DGLEW_STATIC
     -DTIXML_USE_STL
+    -DIMGUI_ENABLE_FREETYPE
 ) 
 
 INCLUDE_DIRECTORIES(SYSTEM
@@ -795,6 +788,24 @@ if(APPLE)
 ENDIF()
 
 
+SET(IMGUI_SRCS
+    ${LIBDIR}/imgui-1.85/imgui.cpp
+    ${LIBDIR}/imgui-1.85/imgui_demo.cpp
+    ${LIBDIR}/imgui-1.85/imgui_draw.cpp
+    ${LIBDIR}/imgui-1.85/imgui_widgets.cpp
+    ${LIBDIR}/imgui-1.85/imgui_tables.cpp
+    ${LIBDIR}/imgui-1.85/imgui_color_picker.cpp
+    ${LIBDIR}/imgui-1.85/implot.cpp
+    ${LIBDIR}/imgui-1.85/implot_items.cpp
+    ${LIBDIR}/imgui-1.85/misc/freetype/imgui_freetype.cpp
+)
+
+ADD_LIBRARY( imgui STATIC
+    ${IMGUI_SRCS}
+)
+
+SET_PROPERTY(TARGET imgui PROPERTY FOLDER "Support")
+
 FILE(GLOB TINYXML_SRCS
     ${LIBDIR}/tinyxml/tinystr.cpp
     ${LIBDIR}/tinyxml/tinyxml.cpp
@@ -803,7 +814,6 @@ FILE(GLOB TINYXML_SRCS
     ${LIBDIR}/tinyxml/tinystr.h
     ${LIBDIR}/tinyxml/tinyxml.h
 )
-
 
 ADD_LIBRARY( tinyxml STATIC
     ${TINYXML_SRCS}
@@ -1173,6 +1183,7 @@ FILE(GLOB OVERGROWTH_INTERNAL_SRCS RELATIVE ${CMAKE_SOURCE_DIR}
     ${SRCDIR}/Compat/compat.h
     ${SRCDIR}/Compat/filepath.h
     ${SRCDIR}/Compat/hardware_info.h
+    ${SRCDIR}/Compat/time.cpp
     ${SRCDIR}/Compat/time.h
     ${SRCDIR}/Compat/os_dialogs.h
     ${SRCDIR}/Compat/fileio.cpp
@@ -1197,7 +1208,6 @@ IF(LINUX)
         ${SRCDIR}/Compat/Linux/linux_compat.cpp
         ${SRCDIR}/Compat/Linux/linux_compat.h
         ${SRCDIR}/Compat/Linux/linux_hardware_info.cpp
-        ${SRCDIR}/Compat/Linux/linux_time.cpp
     )
 ENDIF()
 
@@ -1219,7 +1229,6 @@ IF(APPLE)
         ${SRCDIR}/Compat/Mac/mac_compat.mm
         ${SRCDIR}/Compat/Mac/mac_compat.h
         ${SRCDIR}/Compat/Mac/mac_hardware_info.cpp
-        ${SRCDIR}/Compat/Mac/mac_time.cpp
     )
 ENDIF()
 
@@ -1230,7 +1239,6 @@ IF(WIN32)
             ${SRCDIR}/Compat/Win/win_compat.cpp 
             ${SRCDIR}/Compat/Win/win_compat.h
             ${SRCDIR}/Compat/Win/win_hardware_info.cpp
-            ${SRCDIR}/Compat/Win/win_time.cpp
 	)
 
 	IF(MSVC_VERSION LESS 1911)
@@ -1252,6 +1260,7 @@ LIST(APPEND OVERGROWTH_SRCS
 )
 
 SOURCE_GROUP(Internal FILES ${OVERGROWTH_INTERNAL_SRCS})
+SOURCE_GROUP(ImGui FILES ${IMGUI_SRCS})
 SOURCE_GROUP(TinyXML FILES ${TINYXML_SRCS})
 SOURCE_GROUP(Logging FILES ${LOGGING_SRCS})
 
@@ -1495,7 +1504,6 @@ IF(BUILD_OVERGROWTH)
         CopyDLL("${LIBDIR}/zlib1.2.7/bin/${WINDOWS_LIB_DIR}/zlib1.dll" "zlib.dll")
         CopyDLL("${LIBDIR}/freetype-windows-binaries-2.12.0/release_dll/win64/freetype.dll" "freetype.dll")
         CopyDLL("${LIBDIR}/FreeImage/bin/${VERSION_DIR}/${WINDOWS_LIB_DIR}/FreeImage.dll" "")
-        CopyDLL("${LIBDIR}/xinput/bin/xinput1_3.dll" "")
 	IF(ENABLE_RAD_TELEMETRY)
             #IF(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebIn")
             IF(64BIT_WINDOWS)
@@ -1596,6 +1604,7 @@ IF(BUILD_OVERGROWTH)
         ${FREEIMAGE_LIBRARY}
         triangle
         angelscript
+        imgui
         tinyxml
         trex
         logging
