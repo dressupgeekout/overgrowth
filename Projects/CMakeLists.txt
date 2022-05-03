@@ -1217,7 +1217,6 @@ IF(NETBSD)
         ${SRCDIR}/Compat/NetBSD/netbsd_compat.h
         ${SRCDIR}/Compat/Linux/os_dialogs_linux.cpp
         ${SRCDIR}/Compat/Linux/linux_hardware_info.cpp
-        ${SRCDIR}/Compat/Linux/linux_time.cpp
     )
 ENDIF()
 
