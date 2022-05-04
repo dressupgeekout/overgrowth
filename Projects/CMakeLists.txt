@@ -258,16 +258,23 @@ IF(WIN32)
     ENDIF()
 ENDIF()
 
-IF(LINUX OR NETBSD)
-    # Find with CMake files
+IF(LINUX)
+    FIND_PACKAGE(GTK2 REQUIRED)
     FIND_PACKAGE(SDL2 REQUIRED)
     FIND_PACKAGE(SDL2NET REQUIRED)
+    FIND_PACKAGE(OpenAL REQUIRED)
     FIND_PACKAGE(Freetype REQUIRED)
+ENDIF()
 
-    # Find with pkg-config
+# On NetBSD, rely on pkg-config to get compiler and linker flags, it's much
+# more reliable than FIND_PACKAGE() in my experience.
+IF(NETBSD)
     include(FindPkgConfig)
     PKG_CHECK_MODULES(GTK2 REQUIRED gtk+-2.0)
+    PKG_CHECK_MODULES(SDL2 REQUIRED sdl2)
+    PKG_CHECK_MODULES(SDL2NET REQUIRED SDL2_net)
     PKG_CHECK_MODULES(OPENAL REQUIRED openal)
+    PKG_CHECK_MODULES(FREETYPE REQUIRED freetype2)
     PKG_CHECK_MODULES(LIBPNG REQUIRED libpng)
 
     # Find manually because they don't ship CMakeFiles nor *.pc files
@@ -684,8 +691,8 @@ IF(NETBSD)
 
     INCLUDE_DIRECTORIES(
         ${GTK2_INCLUDE_DIRS}
-        ${SDL2_INCLUDE_DIR}
-        ${SDL2NET_INCLUDE_DIR}
+        ${SDL2_INCLUDE_DIRS}
+        ${SDL2NET_INCLUDE_DIRS}
     )
 ENDIF()
 
@@ -1588,8 +1595,8 @@ IF(BUILD_OVERGROWTH)
         )
 
         TARGET_LINK_LIBRARIES(Overgrowth
-            SDL2
-            ${SDL2NET_LIBRARY}
+            ${SDL2_LIBRARIES}
+            ${SDL2NET_LIBRARIES}
             ${OPENAL_LIBRARIES}
             vorbisfile
             vorbis
@@ -1600,7 +1607,6 @@ IF(BUILD_OVERGROWTH)
             pthread
             bz2
             jpeg
-	        #nvcore nvmath nvimage squish posh
             z
             ${GTK2_LDFLAGS}
             ${LIBPNG_LIBRARIES}
