@@ -276,13 +276,6 @@ IF(NETBSD)
     PKG_CHECK_MODULES(OPENAL REQUIRED openal)
     PKG_CHECK_MODULES(FREETYPE REQUIRED freetype2)
     PKG_CHECK_MODULES(LIBPNG REQUIRED libpng)
-
-    # Find manually because they don't ship CMakeFiles nor *.pc files
-    FIND_LIBRARY(FREEIMAGE_LIBRARY
-      NAMES freeimage
-      PATHS /usr/lib /usr/pkg/lib
-      REQUIRED
-    )
 ENDIF()
 
 SET(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
@@ -678,16 +671,6 @@ IF(LINUX)
 	)
     ENDIF()
 ENDIF() 
-
-IF(NETBSD)
-    MESSAGE(STATUS "SDL2_INCLUDE_DIR: ${SDL2_INCLUDE_DIR}")
-
-    INCLUDE_DIRECTORIES(
-        ${GTK2_INCLUDE_DIRS}
-        ${SDL2_INCLUDE_DIRS}
-        ${SDL2NET_INCLUDE_DIRS}
-    )
-ENDIF()
 
 if(WIN32)
     INCLUDE_DIRECTORIES(
@@ -1530,6 +1513,8 @@ IF(BUILD_OVERGROWTH)
             ${OPENAL_INCLUDE_DIRS}
             ${GTK2_INCLUDE_DIRS}
             ${LIBPNG_INCLUDE_DIRS}
+            ${SDL2_INCLUDE_DIRS}
+            ${SDL2NET_INCLUDE_DIRS}
         )
 
         TARGET_LINK_LIBRARIES(Overgrowth
