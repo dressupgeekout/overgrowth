@@ -277,9 +277,15 @@ IF(NETBSD)
     PKG_CHECK_MODULES(LIBPNG REQUIRED libpng)
 
     # Find manually because they don't ship CMakeFiles nor *.pc files
+    FIND_PATH(FREEIMAGE_INCLUDE_DIR
+      NAMES FreeImage.h
+      PATHS /usr/include /usr/local/include /usr/pkg/include
+      REQUIRED
+    )
+
     FIND_LIBRARY(FREEIMAGE_LIBRARY
       NAMES freeimage
-      PATHS /usr/lib /usr/pkg/lib
+      PATHS /usr/lib /usr/local/lib /usr/pkg/lib
       REQUIRED
     )
 ENDIF()
@@ -684,16 +690,6 @@ IF(LINUX)
 	)
     ENDIF()
 ENDIF() 
-
-IF(NETBSD)
-    MESSAGE(STATUS "SDL2_INCLUDE_DIR: ${SDL2_INCLUDE_DIR}")
-
-    INCLUDE_DIRECTORIES(
-        ${GTK2_INCLUDE_DIRS}
-        ${SDL2_INCLUDE_DIRS}
-        ${SDL2NET_INCLUDE_DIRS}
-    )
-ENDIF()
 
 if(WIN32)
     INCLUDE_DIRECTORIES(
@@ -1268,6 +1264,10 @@ IF(BUILD_OVERGROWTH)
         COMPILE_DEFINITIONS OG_WORKER=1
     )
 
+    TARGET_INCLUDE_DIRECTORIES(OvergrowthWorker
+        SYSTEM PUBLIC ${FREEIMAGE_INCLUDE_DIR}
+    )
+
     TARGET_LINK_LIBRARIES(OvergrowthWorker
         ${FREEIMAGE_LIBRARY}
         tinyxml
@@ -1591,6 +1591,8 @@ IF(BUILD_OVERGROWTH)
             ${OPENAL_INCLUDE_DIRS}
             ${GTK2_INCLUDE_DIRS}
             ${LIBPNG_INCLUDE_DIRS}
+            ${SDL2_INCLUDE_DIRS}
+            ${SDL2NET_INCLUDE_DIRS}
         )
 
         TARGET_LINK_LIBRARIES(Overgrowth
