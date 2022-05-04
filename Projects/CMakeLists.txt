@@ -263,7 +263,6 @@ IF(LINUX)
     FIND_PACKAGE(SDL2 REQUIRED)
     FIND_PACKAGE(SDL2NET REQUIRED)
     FIND_PACKAGE(OpenAL REQUIRED)
-    FIND_PACKAGE(Freetype REQUIRED)
 ENDIF()
 
 # On NetBSD, rely on pkg-config to get compiler and linker flags, it's much
