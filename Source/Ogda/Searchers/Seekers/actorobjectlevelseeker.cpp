@@ -121,9 +121,9 @@ public:
                 while( el )
                 {
                     bool found = false;
-                    for( int i = 0; i < parameters.size(); i++ )
+                    for(auto & parameter : parameters)
                     {
-                        found |= parameters[i].Search(
+                        found |= parameter.Search(
                             items, 
                             item, 
                             el);
@@ -290,18 +290,18 @@ void ActorObjectLevelSeeker::SearchGroup( std::vector<Item>& items, const Item& 
         aos.push_back(ao);
     }
     {
-        std::vector<Parameter> params = global_params;
+        const std::vector<Parameter>& params = global_params;
         ActorObject ao( "CameraObject", "", true, params  );
         aos.push_back(ao);
     }
     {
-        std::vector<Parameter> params = global_params;
+        const std::vector<Parameter>& params = global_params;
 
         ActorObject ao( "parameters", "", true, params  );
         aos.push_back(ao);
     }
     {
-        std::vector<Parameter> params = global_params;
+        const std::vector<Parameter>& params = global_params;
         ActorObject ao( "AmbientSoundObject", "ambient_sound_object", false, params  );
         aos.push_back(ao);
     }
@@ -347,7 +347,7 @@ void ActorObjectLevelSeeker::SearchGroup( std::vector<Item>& items, const Item& 
         aos.push_back(ao);
     }
     {
-        std::vector<Parameter> params = global_params;
+        const std::vector<Parameter>& params = global_params;
         ActorObject ao( "Decal", "decal_object", false, params  );
         aos.push_back(ao);
     }
@@ -411,7 +411,7 @@ void ActorObjectLevelSeeker::SearchGroup( std::vector<Item>& items, const Item& 
         aos.push_back(ao);
     }
     {
-        std::vector<Parameter> params = global_params;
+        const std::vector<Parameter>& params = global_params;
         ActorObject ao( "ItemObject", "item", false, params  );
         aos.push_back(ao);
     }
@@ -424,17 +424,17 @@ void ActorObjectLevelSeeker::SearchGroup( std::vector<Item>& items, const Item& 
         aos.push_back(ao);
     }
     {
-        std::vector<Parameter> params = global_params;
+        const std::vector<Parameter>& params = global_params;
         ActorObject ao( "NavmeshRegionObject", "", true, params  );
         aos.push_back(ao);
     }
     {
-        std::vector<Parameter> params = global_params;
+        const std::vector<Parameter>& params = global_params;
         ActorObject ao( "NavmeshHintObject", "", true, params  );
         aos.push_back(ao);
     }
     {
-        std::vector<Parameter> params = global_params;
+        const std::vector<Parameter>& params = global_params;
         ActorObject ao( "NavmeshConnectionObject", "", true, params  );
         aos.push_back(ao);
     }
@@ -446,7 +446,7 @@ void ActorObjectLevelSeeker::SearchGroup( std::vector<Item>& items, const Item& 
         aos.push_back(ao);
     }
     {
-        std::vector<Parameter> params = global_params;
+        const std::vector<Parameter>& params = global_params;
         ActorObject ao( "LightVolumeObject", "", true, params  );
         aos.push_back(ao);
     }
@@ -468,37 +468,37 @@ void ActorObjectLevelSeeker::SearchGroup( std::vector<Item>& items, const Item& 
         aos.push_back(ao);
     }
     {
-        std::vector<Parameter> params = global_params;
+        const std::vector<Parameter>& params = global_params;
 
         ActorObject ao( "Group", "", true, params  );
         aos.push_back(ao);
     }
     {
-        std::vector<Parameter> params = global_params;
+        const std::vector<Parameter>& params = global_params;
 
         ActorObject ao( "Prefab", "prefab", true, params  );
         aos.push_back(ao);
     }
     {
-        std::vector<Parameter> params = global_params;
+        const std::vector<Parameter>& params = global_params;
 
         ActorObject ao( "EnvObjectAttachments", "", true, params  );
         aos.push_back(ao);
     }
     {
-        std::vector<Parameter> params = global_params;
+        const std::vector<Parameter>& params = global_params;
 
         ActorObject ao( "Palette", "", true, params  );
         aos.push_back(ao);
     }
     {
-        std::vector<Parameter> params = global_params;
+        const std::vector<Parameter>& params = global_params;
 
         ActorObject ao( "ItemConnections", "", true, params  );
         aos.push_back(ao);
     }
     {
-        std::vector<Parameter> params = global_params;
+        const std::vector<Parameter>& params = global_params;
 
         ActorObject ao( "Connections", "", true, params  );
         aos.push_back(ao);
@@ -523,9 +523,9 @@ void ActorObjectLevelSeeker::SearchGroup( std::vector<Item>& items, const Item& 
 
         bool found = false;
 
-        for( int i = 0; i < aos.size(); i++ )
+        for(auto & ao : aos)
         {
-            found |= aos[i].Search( items, item, el );
+            found |= ao.Search( items, item, el );
         } 
 
         if( !found )
@@ -551,9 +551,9 @@ std::vector<Item> ActorObjectLevelSeeker::SearchLevelRoot( const Item& source, T
         "Hotspots"
     };
 
-    for( int i = 0; i < ARRLEN(entity_roots); i++ )
+    for(auto & entity_root : entity_roots)
     {
-        TiXmlElement* elem = hRoot.FirstChildElement(entity_roots[i]).ToElement();
+        TiXmlElement* elem = hRoot.FirstChildElement(entity_root).ToElement();
 
         if( elem )
         {
@@ -561,7 +561,7 @@ std::vector<Item> ActorObjectLevelSeeker::SearchLevelRoot( const Item& source, T
         }
         else
         {
-            LOGD << source << " Is missing " << entity_roots[i] << std::endl;
+            LOGD << source << " Is missing " << entity_root << std::endl;
         }
     }
     return items;

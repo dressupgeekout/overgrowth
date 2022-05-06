@@ -178,7 +178,7 @@ const int overgrowth_dds_cache_version = 1;
 //The case for looking for both the normal image and the converted became so common I felt the need for this simplification.
 
 //Currently ignoring the modsource, should set it to the correct source if it's not null TODO
-int FindImagePath( const char* path, char* buf, int buf_size, PathFlagsBitfield flags, bool is_necessary, PathFlags* resulting_path, bool allow_crn, ModID* modsource )
+int FindImagePath( const char* path, char* buf, int buf_size, PathFlagsBitfield flags, bool is_necessary, PathFlags* resulting_path, bool allow_crn, bool allow_dds, ModID* modsource )
 {
     const char* fallback = "Data/Textures/error.tga";
     // We might want a converted image, let's assume it's priority for reasons like performance
@@ -192,7 +192,10 @@ int FindImagePath( const char* path, char* buf, int buf_size, PathFlagsBitfield 
     ModID dds_modsources[kMaxPaths];
     PathFlags orig_flags[kMaxPaths];
     ModID orig_modsources[kMaxPaths];
-    int num_dds_paths_found = FindFilePaths( dds_converted.c_str(), dds_paths, buf_size, kMaxPaths, flags, false, dds_flags, dds_modsources );
+    int num_dds_paths_found = 0;
+    if( allow_dds) {
+        num_dds_paths_found = FindFilePaths( dds_converted.c_str(), dds_paths, buf_size, kMaxPaths, flags, false, dds_flags, dds_modsources );
+    }
     if (num_dds_paths_found == 0 && allow_crn) {
         num_dds_paths_found = FindFilePaths( crn_converted.c_str(), dds_paths, buf_size, kMaxPaths, flags, false, dds_flags, dds_modsources );
     }
@@ -980,7 +983,7 @@ string ApplicationPathSeparators( const string& v )
 	size_t slash_pos = 0;
 	string res = v;
 
-	while( (slash_pos = res.find_first_of("\\")) != string::npos )
+	while( (slash_pos = res.find_first_of('\\')) != string::npos )
 	{
 		res[slash_pos] = '/';
 	}
@@ -1007,7 +1010,7 @@ string NormalizePathSeparators( const string& v)
 		res[slash_pos] = '\\';
 	}
 #else
-	while( (slash_pos = res.find_first_of("\\")) != string::npos )
+	while( (slash_pos = res.find_first_of('\\')) != string::npos )
 	{
 		res[slash_pos] = '/';
 	}
@@ -1064,7 +1067,7 @@ Path FindShortestPath2(const string& p1)
 
         if(!try_again)
         {
-            next_slash = current_path.find_first_of("/");
+            next_slash = current_path.find_first_of('/');
             if( next_slash != string::npos )
             {
                 current_path = current_path.substr(next_slash+1);
@@ -1112,10 +1115,10 @@ void ClearCache( bool dry_run )
     modids = ModLoading::Instance().GetModsSid();
 #endif
     modids.push_back(CoreGameModID);
-    for( unsigned i = 0; i < modids.size(); i++ ) 
+    for(auto & modid : modids) 
     {
         stringstream write_data_path;
-        write_data_path << GetWritePath(modids[i]);
+        write_data_path << GetWritePath(modid);
         write_data_path << "Data/";
 
         vector<string> write_dir_files;
@@ -1185,16 +1188,12 @@ void ClearCache( bool dry_run )
         vector<string> keep_files;
         vector<string> remove_files;
 
-        for( vector<string>::iterator pit = write_dir_files.begin();
-             pit != write_dir_files.end();
-             pit++ ) 
+        for(auto & write_dir_file : write_dir_files) 
         {
             bool found = false;
-            for( vector<pair<string,string> >::iterator fit = remove_with_ending.begin();
-                 fit != remove_with_ending.end();
-                 fit++ )
+            for(auto & fit : remove_with_ending)
             {
-                if( hasBeginning( *pit, fit->first) && hasEnding( *pit, fit->second ) )
+                if( hasBeginning( write_dir_file, fit.first) && hasEnding( write_dir_file, fit.second ) )
                 {
                     found = true;
                 }
@@ -1203,11 +1202,9 @@ void ClearCache( bool dry_run )
             if( found ) 
             {
                 /* Second pass with exclusion, if there's one match, regret inclusion, exclusion overrides */
-                for( vector<pair<string,string> >::iterator fit = exclude_with_ending.begin();
-                     fit != exclude_with_ending.end();
-                     fit++ )
+                for(auto & fit : exclude_with_ending)
                 {
-                    if( hasBeginning( *pit, fit->first) && ( fit->second.empty() || hasEnding( *pit, fit->second ) ) )
+                    if( hasBeginning( write_dir_file, fit.first) && ( fit.second.empty() || hasEnding( write_dir_file, fit.second ) ) )
                     {
                         found = false;
                     }
@@ -1216,17 +1213,17 @@ void ClearCache( bool dry_run )
 
             if( found )
             {
-                remove_files.push_back( *pit );
+                remove_files.push_back( write_dir_file );
             }
             else
             {
-                keep_files.push_back( *pit );
+                keep_files.push_back( write_dir_file );
             }
         }
 
-        for( unsigned int i = 0; i < remove_files.size(); i++ )
+        for(auto & remove_file : remove_files)
         {
-            string path = write_data_path.str() + remove_files[i];
+            string path = write_data_path.str() + remove_file;
             LOGI << "Removing: " << path  << endl;
             if( dry_run == false )
             {
@@ -1242,9 +1239,9 @@ void ClearCache( bool dry_run )
         {
             //Create a set with all unique folder paths
             set<string> folder_paths; 
-            for( unsigned int i = 0; i < remove_files.size(); i++ )
+            for(auto & remove_file : remove_files)
             {
-                string base = SplitPathFileName( remove_files[i] ).first;
+                string base = SplitPathFileName( remove_file ).first;
 
                 while( base.empty() == false )
                 {
@@ -1268,9 +1265,9 @@ void ClearCache( bool dry_run )
 
             sort(empty_folder_paths.begin(), empty_folder_paths.end(), string_sort_by_length_r );
 
-            for( unsigned i = 0; i < empty_folder_paths.size(); i++ )
+            for(auto & empty_folder_path : empty_folder_paths)
             {
-                string path = write_data_path.str() + empty_folder_paths[i];
+                string path = write_data_path.str() + empty_folder_path;
                 LOGI << "Removing Empty Folder:" << path << endl;
                 if( deletefile(path.c_str()) != 0 )
                 {
@@ -1280,9 +1277,9 @@ void ClearCache( bool dry_run )
             }
         }
 
-        for( unsigned int i = 0; i < keep_files.size(); i++ )
+        for(auto & keep_file : keep_files)
         {
-            string path = write_data_path.str() + keep_files[i];
+            string path = write_data_path.str() + keep_file;
             LOGI << "Keeping: " << path << endl;
         }
     }

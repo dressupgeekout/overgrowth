@@ -228,7 +228,7 @@ int WriteConfigToStream(asIScriptEngine *engine, ostream &strm)
 			for(;;)
 			{
 				// Find " characters
-				pos = str.find("\"",pos);
+				pos = str.find('\"',pos);
 				if( pos == string::npos )
 					break;
 
@@ -464,10 +464,9 @@ int WriteConfigToStream(asIScriptEngine *engine, ostream &strm)
 	// Write the members of the template types, so they can be fully registered before any other type uses them
 	// TODO: Order the template types based on dependency to avoid failure if one type uses instances of another 
 	strm << "\n// Template type members\n";
-	for( set<asITypeInfo*>::iterator it = templateTypes.begin(); it != templateTypes.end(); ++it )
+	for(auto type : templateTypes)
 	{
-		asITypeInfo *type = *it;
-		TypeWriter::Write(engine, strm, type, currNamespace, currAccessMask);
+			TypeWriter::Write(engine, strm, type, currNamespace, currAccessMask);
 	}
 
 	// Write the object types members
@@ -700,7 +699,7 @@ int ConfigEngineFromStream(asIScriptEngine *engine, istream &strm, const char *c
 			in::ReplaceSlashQuote(decl);
 
 			// Remove the $ that the engine prefixes the behaviours with
-			size_t n = decl.find("$");
+			size_t n = decl.find('$');
 			if( n != string::npos )
 				decl[n] = ' ';
 

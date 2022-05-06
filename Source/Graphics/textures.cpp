@@ -349,8 +349,8 @@ void Textures::DrawImGuiDebug() {
 Textures::Textures() {
     process_pool = new ProcessPool(worker_app_path);
     PROFILED_TEXTURE_MUTEX_LOCK
-    for(unsigned int i=0; i<_texture_units; i++){
-        bound_texture[i]=INVALID_ID;
+    for(unsigned int & i : bound_texture){
+        i=INVALID_ID;
     }
     m_wrap_t = _default_wrap;
     m_wrap_s = _default_wrap;
@@ -467,8 +467,8 @@ void Textures::DisposeTexture(int which, bool free_space) {
         LOGI << "Disposed texture " << texture.name  << " with gl id " << texture.gl_texture_id << std::endl;
     }
 
-    for (unsigned int i = 0; i < texture.sub_textures.size(); i++) {
-        delete texture.sub_textures[i].texture_data;
+    for (auto & sub_texture : texture.sub_textures) {
+        delete sub_texture.texture_data;
     }
 
     texture.sub_textures.clear();
@@ -562,7 +562,7 @@ void Textures::ReloadInternal() {
                 SubTexture &sub = texture.sub_textures[s];
                 LOG_ASSERT(!sub.texture_name.empty());
                 ModID modsource;
-                if (FindImagePath(sub.texture_name.c_str(), abs_path, kPathSize, kAnyPath, false,NULL,true, &modsource) == 0){
+                if (FindImagePath(sub.texture_name.c_str(), abs_path, kPathSize, kAnyPath, false,NULL,true, true, &modsource) == 0){
                     if(strcmp(abs_path, sub.load_name.c_str()) == 0 && GetDateModifiedInt64(abs_path) == sub.orig_modified){
                         LogSystem::LogData(LogSystem::debug, "tex", __FILE__, __LINE__) << " slice " << s << ": \"" << sub.texture_name << "\" no" << std::endl;
                     } else {
@@ -824,8 +824,7 @@ void Textures::TextureToVRAM(unsigned int which) {
     CHECK_GL_ERROR();
 
     if (!deferred_delete_textures.empty()) {
-        for (std::list<GLuint>::iterator it = deferred_delete_textures.begin(); it != deferred_delete_textures.end(); it++) {
-            GLuint tex_id = *it;
+        for (unsigned int tex_id : deferred_delete_textures) {
             LOGI << "Deferred delete of texture " << tex_id << std::endl;
             glDeleteTextures(1, &tex_id);
         }
@@ -853,8 +852,8 @@ void Textures::TextureToVRAM(unsigned int which) {
 
     if(tex.gl_texture_id != UNLOADED_ID)return;
 
-    for( unsigned i = 0; i < tex.sub_textures.size(); i++ ) {
-        tex.sub_textures[i].texture_data->EnsureInRAM();
+    for(auto & sub_texture : tex.sub_textures) {
+        sub_texture.texture_data->EnsureInRAM();
     }
                 
     bool is_array = (tex.sub_textures.size() > 1);
@@ -1966,7 +1965,7 @@ int Textures::loadTexture(const std::string& rel_path, unsigned int which, unsig
     char abs_path[kPathSize];
     PathFlags res_source;
     ModID modsource;
-    int err = FindImagePath(rel_path.c_str(), abs_path, kPathSize, kDataPaths | kModPaths | kWriteDir | kAbsPath | kModWriteDirs, true, &res_source, true, &modsource );
+    int err = FindImagePath(rel_path.c_str(), abs_path, kPathSize, kDataPaths | kModPaths | kWriteDir | kAbsPath | kModWriteDirs, true, &res_source, true, true, &modsource );
     if(err == -1){
         //DisplayError("Error", "Could not find texture: %s", rel_path.c_str());
         return kLoadErrorMissingFile;
@@ -2091,7 +2090,7 @@ void Textures::loadArraySlice(const TextureRef& texref, unsigned int slice, cons
 
     char abs_path[kPathSize];
     ModID modsource;
-    int err = FindImagePath(rel_path.c_str(), abs_path, kPathSize, kDataPaths | kModPaths | kWriteDir | kModWriteDirs, true, NULL, true, &modsource);
+    int err = FindImagePath(rel_path.c_str(), abs_path, kPathSize, kDataPaths | kModPaths | kWriteDir | kModWriteDirs, true, NULL, true, true, &modsource);
     if(err == -1){
         FatalError("Error", "Could not find texture: %s", rel_path.c_str());
     }
@@ -2670,8 +2669,8 @@ bool Textures::ReloadAsCompressed(const TextureRef& texref) {
 
     CreateParentDirs(newPath.c_str());
 
-    for (unsigned int i = 0; i < texture.sub_textures.size(); i++) {
-        TextureData *tex_data = texture.sub_textures[i].texture_data;
+    for (auto & sub_texture : texture.sub_textures) {
+        TextureData *tex_data = sub_texture.texture_data;
         LOG_ASSERT(tex_data != NULL);
         if (!tex_data->HasMipmaps()) {
             tex_data->GenerateMipmaps();
@@ -2684,7 +2683,7 @@ bool Textures::ReloadAsCompressed(const TextureRef& texref) {
 
     char abs_path[kPathSize];
     ModID modsource;
-    if(FindImagePath(newName.c_str(), abs_path, kPathSize, kWriteDir | kModWriteDirs, true, NULL, true, &modsource) == -1) {
+    if(FindImagePath(newName.c_str(), abs_path, kPathSize, kWriteDir | kModWriteDirs, true, NULL, true, true, &modsource) == -1) {
         LOGE << "Texture not found after writing it" << std::endl;
         return false;
     }
