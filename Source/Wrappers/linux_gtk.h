@@ -21,12 +21,12 @@
 //
 //-----------------------------------------------------------------------------
 #ifdef __GNUC__
-#   pragma GCC diagnostic push
-#   pragma GCC diagnostic ignored "-Wpedantic"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
 #endif
 #if defined(PLATFORM_LINUX) || defined(PLATFORM_NETBSD)
 #include <gtk/gtk.h>
 #endif
 #ifdef __GNUC__
-#   pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
 #endif
