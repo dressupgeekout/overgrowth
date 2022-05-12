@@ -1160,10 +1160,6 @@ IF(BUILD_OVERGROWTH)
         COMPILE_DEFINITIONS OG_WORKER=1
     )
 
-    TARGET_INCLUDE_DIRECTORIES(OvergrowthWorker
-        SYSTEM PUBLIC ${FREEIMAGE_INCLUDE_DIR}
-    )
-
     TARGET_LINK_LIBRARIES(OvergrowthWorker
         OvergrowthCompat
         OvergrowthLogging
