@@ -291,7 +291,6 @@ IF(BUILD_OVERGROWTH)
     ADD_SUBDIRECTORY(minizip minizip)
     ADD_SUBDIRECTORY(murmurhash3 murmurhash3)
     ADD_SUBDIRECTORY(binn binn)
-    ADD_SUBDIRECTORY(TheoraPlayer TheoraPlayer)
     ADD_SUBDIRECTORY(recastnavigation recastnavigation)
     # disable all demos
     SET(BUILD_DEMOS OFF CACHE BOOL "Set when you want to build the demos for underlying library")
@@ -308,7 +307,6 @@ IF(BUILD_OVERGROWTH)
     SET_PROPERTY(TARGET angelscript PROPERTY FOLDER "Support/Angelscript")
     SET_PROPERTY(TARGET triangle PROPERTY FOLDER "Support")
     SET_PROPERTY(TARGET minizip PROPERTY FOLDER "Support")
-    SET_PROPERTY(TARGET TheoraPlayer PROPERTY FOLDER "Support")
     SET_PROPERTY(TARGET glad PROPERTY FOLDER "Support")
     SET_PROPERTY(TARGET BulletCollision PROPERTY FOLDER "Support/BulletPhysics")
     SET_PROPERTY(TARGET BulletDynamics PROPERTY FOLDER "Support/BulletPhysics")
@@ -537,7 +535,6 @@ IF(WIN32)
         ${LIBDIR}/vorbis/lib/${WINDOWS_LIB_DIR}
         ${LIBDIR}/nvapi/${WINDOWS_LIB_DIR}
         ${LIBDIR}/zlib1.2.7/lib/${WINDOWS_LIB_DIR}
-        ${LIBDIR}/theora/lib/${WINDOWS_LIB_DIR}
         ${LIBDIR}/openvr-master/lib/win/${WINDOWS_LIB_DIR}
 	    ${LIBDIR}/breakpad/src/client/windows/lib/${WINDOWS_LIB_DIR}
         ${LIBDIR}/xinput/Lib/x86
@@ -556,7 +553,6 @@ IF(APPLE)
     LINK_DIRECTORIES(
         ${LIBDIR}/libogg-1.3.3/lib/mac64
         ${LIBDIR}/libvorbis-1.3.6/lib/mac64
-        ${LIBDIR}/libtheora-1.1.1/lib/mac64
     )
 
     IF(ENABLE_STEAMWORKS)
@@ -626,7 +622,6 @@ INCLUDE_DIRECTORIES(
     ${LIBDIR}/recastnavigation/DetourCrowd/Include
     ${LIBDIR}/zstd-1.5.0/lib
     ${LIBDIR}/binn-3.0/src
-    ${LIBDIR}/TheoraPlayer/Source
     ${LIBDIR}/freetype-2.12.1/include
 )
 
@@ -673,7 +668,6 @@ if(WIN32)
       ${LIBDIR}/zlib1.2.7/include
       ${LIBDIR}/ogg/include
       ${LIBDIR}/vorbis/include
-      ${LIBDIR}/theora/include
       ${LIBDIR}/NvToolsExt/include
       ${SDL2_SOURCE_DIR}/include
       "${LIBDIR}/openal-soft-1.18.0-bin/include/AL"
@@ -693,7 +687,6 @@ if(APPLE)
         #${LIBDIR}/../MacInterfaces/
         ${LIBDIR}/libogg-1.3.3/include
         ${LIBDIR}/libvorbis-1.3.6/include
-        ${LIBDIR}/libtheora-1.1.1/include
         ${LIBDIR}/SDL2-2.0.20/SDL2.framework/Headers
         ${LIBDIR}/SDL2_net-2.0.1/SDL2_net.framework/Headers
         ${SDL2_SOURCE_DIR}/include
@@ -1301,7 +1294,6 @@ IF(BUILD_OVERGROWTH)
         CopyDLL("${LIBDIR}/ogg/bin/${WINDOWS_LIB_DIR}/libogg.dll" "")
         CopyDLL("${LIBDIR}/vorbis/bin/${WINDOWS_LIB_DIR}/libvorbis.dll" "")
         CopyDLL("${LIBDIR}/vorbis/bin/${WINDOWS_LIB_DIR}/libvorbisfile.dll" "")
-        CopyDLL("${LIBDIR}/theora/bin/${WINDOWS_LIB_DIR}/libtheora.dll" "")
         CopyDLL("${LIBDIR}/zlib1.2.7/bin/${WINDOWS_LIB_DIR}/zlib1.dll" "zlib.dll")
         IF(ENABLE_RAD_TELEMETRY)
             #IF(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebIn")
@@ -1365,7 +1357,6 @@ IF(BUILD_OVERGROWTH)
 #   SET_PROPERTY(TARGET game                    PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
     SET_PROPERTY(TARGET triangle                PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
     SET_PROPERTY(TARGET minizip                 PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
-    SET_PROPERTY(TARGET TheoraPlayer            PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
     SET_PROPERTY(TARGET glad                    PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
     SET_PROPERTY(TARGET trex                    PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
     SET_PROPERTY(TARGET BulletCollision         PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
@@ -1400,7 +1391,6 @@ IF(BUILD_OVERGROWTH)
         murmurhash3
         binn
         glad
-        TheoraPlayer
         triangle
         angelscript
         imgui
@@ -1429,8 +1419,6 @@ IF(BUILD_OVERGROWTH)
             libogg
             libvorbis
             libvorbisfile
-            libtheora
-            glu32
             SDL2
             SDL2main
             SDL2_net
@@ -1481,9 +1469,7 @@ IF(BUILD_OVERGROWTH)
             vorbisfile
             vorbis
             ogg
-            theoradec
             GL
-            GLU
             pthread
             bz2
             jpeg
@@ -1515,7 +1501,6 @@ IF(BUILD_OVERGROWTH)
             ogg
             vorbis
             vorbisfile
-            theoradec
             bz2
         )
 	IF(ENABLE_STEAMWORKS)
