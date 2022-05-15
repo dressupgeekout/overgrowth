@@ -12,7 +12,7 @@
 #include <process.h>
 #endif
 
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(__NetBSD__)
 #include <sys/sysctl.h>
 #include <fcntl.h>
 #elif defined(__GNUC__)
@@ -30,7 +30,7 @@ namespace crnlib
       SYSTEM_INFO g_system_info;
       GetSystemInfo(&g_system_info);
       g_number_of_processors = math::maximum<uint>(1U, g_system_info.dwNumberOfProcessors);
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__NetBSD__)
       int count;
       size_t size = sizeof(count);
 

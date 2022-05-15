@@ -1,6 +1,7 @@
 //-----------------------------------------------------------------------------
-//           Name: common.h
+//           Name: netbsd_compat.cpp
 //      Developer: Wolfire Games LLC
+//         Author: Charlotte Koch
 //    Description:
 //        License: Read below
 //-----------------------------------------------------------------------------
@@ -20,26 +21,8 @@
 //   limitations under the License.
 //
 //-----------------------------------------------------------------------------
-#pragma once
 
-#include <stdarg.h>
-
-#include <Utility/assert.h>
-
-#include <cstdio>
-#include <cassert>
-
-float MoveTowards(float val, float target, float amount);
-
-inline void VFormatString(char* buf, int buf_size, const char* fmt, va_list args) {
-    int val = vsnprintf(buf, buf_size, fmt, args);
-    if (val == -1 || val >= buf_size) {
-        buf[buf_size - 1] = '\0';
-        LOG_ASSERT(false);  // Failed to format string
-    }
+int os_copyfile( const char *source, const char *dest )
+{
+    return -1;
 }
-
-void FormatString(char* buf, int buf_size, const char* fmt, ...);
-
-int djb2_hash(unsigned char* str);
-int djb2_hash_len(unsigned char* str, int len);

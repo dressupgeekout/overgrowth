@@ -174,13 +174,22 @@ void FontRendererImpl::SetTransform(int face_id, FT_Matrix *matrix, FT_Vector *v
 }
 
 FT_GlyphSlot FontRendererImpl::RenderCharacterBitmap(int face_id, uint32_t character, FontRenderer::RCB_Flags flags) {
+/* XXX STUPID CHARLOTTE HACK */
+//printf("FontRendererImpl::RenderCharacterbitmap(%d, %d)\n", face_id, character);
+#if 1 
+    if (character == 170) character = 169;
+    if (character == 178) character = 169;
+    if (character == 179) character = 169;
+    if (character == 185) character = 169;
+    if (character == 186) character = 169;
+#endif
     FT_Face face = faces_[face_id].face;
     // Get index of a glyph
     int glyph_index = FT_Get_Char_Index(face, character);
     // Load glyph into slot
     int error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
     if (error) {
-        FatalError("Error", "Failed to load font glyph into slot");
+        FatalError("Error","Failed to load font glyph into slot: %s (%d)", FT_Error_String(error), error);
     }
     // Render glyph in slot
     if (flags & FontRenderer::RCB_RENDER) {

@@ -202,6 +202,9 @@ ENDIF()
 IF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     SET(LINUX TRUE)
 ENDIF()
+IF(CMAKE_SYSTEM_NAME STREQUAL "NetBSD")
+    SET(NETBSD TRUE)
+ENDIF()
 
 if(LINUX)
     OPTION(FORCE32 "Force a 32build on a 64bit host" OFF)
@@ -256,6 +259,18 @@ IF(LINUX)
     FIND_PACKAGE(SDL2 REQUIRED)
     FIND_PACKAGE(SDL2NET REQUIRED)
     FIND_PACKAGE(OpenAL REQUIRED)
+ENDIF()
+
+# On NetBSD, rely on pkg-config to get compiler and linker flags, it's much
+# more reliable than FIND_PACKAGE() in my experience.
+IF(NETBSD)
+    include(FindPkgConfig)
+    PKG_CHECK_MODULES(GTK2 REQUIRED gtk+-2.0)
+    PKG_CHECK_MODULES(SDL2 REQUIRED sdl2)
+    PKG_CHECK_MODULES(SDL2NET REQUIRED SDL2_net)
+    PKG_CHECK_MODULES(OPENAL REQUIRED openal)
+    PKG_CHECK_MODULES(FREETYPE REQUIRED freetype2)
+    PKG_CHECK_MODULES(LIBPNG REQUIRED libpng)
 ENDIF()
 
 #Build static libraries only for subprojects
@@ -368,6 +383,11 @@ IF(LINUX)
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -rdynamic -fno-omit-frame-pointer")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -rdynamic -fno-omit-frame-pointer")
 
+ENDIF()
+
+IF(NETBSD)
+    ADD_DEFINITIONS(-DPLATFORM_NETBSD=1)
+    ADD_DEFINITIONS(${GTK2_DEFINITIONS})
 ENDIF()
 
 IF(APPLE)
@@ -767,6 +787,13 @@ IF(LINUX)
     )
 ENDIF()
 
+IF(NETBSD)
+    TARGET_SOURCES(OvergrowthCompat PRIVATE
+        ${SRCDIR}/Compat/NetBSD/netbsd_compat.cpp
+        ${SRCDIR}/Compat/NetBSD/netbsd_compat.h
+    )
+ENDIF()
+
 IF(APPLE)
     TARGET_SOURCES(OvergrowthCompat PRIVATE
         ${SRCDIR}/Compat/Mac/mac_compat.mm
@@ -978,6 +1005,14 @@ IF(LINUX)
     )
 ENDIF()
 
+IF(NETBSD)
+    LIST(APPEND OVERGROWTH_INTERNAL_SRCS
+        ${SRCDIR}/Compat/NetBSD/netbsd_compat.cpp
+        ${SRCDIR}/Compat/NetBSD/netbsd_compat.h
+        ${SRCDIR}/Compat/Linux/os_dialogs_linux.cpp
+        ${SRCDIR}/Compat/Linux/linux_hardware_info.cpp
+    )
+ENDIF()
 
 IF(APPLE)
     LIST(APPEND OVERGROWTH_INTERNAL_SRCS 
@@ -1113,7 +1148,7 @@ IF(BUILD_OVERGROWTH)
     ADD_EXECUTABLE(OvergrowthWorker ${OVERGROWTHWORKER_SRCS} ${WIN_RESOURCE_FILE})
     SET_TARGET_PROPERTIES(OvergrowthWorker PROPERTIES
         OUTPUT_NAME ${OVERGROWTH_WORKER_OUTPUT_NAME}
-        COMPILE_FLAGS ${SSE_FLAGS}
+        COMPILE_FLAGS "${SSE_FLAGS}"
         COMPILE_DEFINITIONS NO_ERR=1
         COMPILE_DEFINITIONS OG_WORKER=1
     )
@@ -1126,6 +1161,12 @@ IF(BUILD_OVERGROWTH)
         glad
         crnlib
     )
+
+    IF(NETBSD)
+        TARGET_LINK_LIBRARIES(OvergrowthWorker
+            jemalloc # for malloc_usable_size(3)
+        )
+    endif()
 
     IF(MSVC)
         ADD_COMPILE_OPTIONS(/permissive-)
@@ -1402,21 +1443,39 @@ IF(BUILD_OVERGROWTH)
 
     IF(LINUX)
         TARGET_LINK_LIBRARIES(Overgrowth
-            SDL2
-            ${SDL2NET_LIBRARY}
-            openal
+            dl
+        )
+    ENDIF()
+
+    IF(NETBSD)
+        TARGET_LINK_LIBRARIES(Overgrowth
+            jemalloc # for malloc_usable_size(3)
+        )
+    ENDIF()
+
+    IF(LINUX OR NETBSD)
+        TARGET_INCLUDE_DIRECTORIES(Overgrowth PUBLIC
+            ${OPENAL_INCLUDE_DIRS}
+            ${GTK2_INCLUDE_DIRS}
+            ${LIBPNG_INCLUDE_DIRS}
+            ${SDL2_INCLUDE_DIRS}
+            ${SDL2NET_INCLUDE_DIRS}
+        )
+
+        TARGET_LINK_LIBRARIES(Overgrowth
+            ${SDL2_LIBRARIES}
+            ${SDL2NET_LIBRARIES}
+            ${OPENAL_LIBRARIES}
             vorbisfile
             vorbis
             ogg
             GL
             pthread
             bz2
-            png
             jpeg
-	        #nvcore nvmath nvimage squish posh
             z
-            dl
-            ${GTK2_LIBRARIES}
+            ${GTK2_LDFLAGS}
+            ${LIBPNG_LIBRARIES}
         )
 
 	IF(ENABLE_STEAMWORKS)
