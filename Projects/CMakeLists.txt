@@ -818,7 +818,7 @@ IF(WIN32)
     )
 ENDIF()
 
-IF(LINUX AND BUILD_OGDA) #Making Ogda linux only for now.
+IF(BUILD_OGDA)
     FILE(GLOB OGDA_SRCS RELATIVE ${CMAKE_SOURCE_DIR}
         ${SRCDIR}/Threading/thread_sanity.cpp
         ${SRCDIR}/Threading/thread_sanity.h
@@ -935,6 +935,10 @@ IF(LINUX AND BUILD_OGDA) #Making Ogda linux only for now.
         crnlib
         glad
     )
+
+    IF(NETBSD)
+        TARGET_LINK_LIBRARIES(Ogda jemalloc) # for malloc_usable_size(4)
+    ENDIF()
 
     SET_TARGET_PROPERTIES(Ogda PROPERTIES
         COMPILE_DEFINITIONS OGDA=1
