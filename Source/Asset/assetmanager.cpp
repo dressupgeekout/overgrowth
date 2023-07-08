@@ -244,10 +244,6 @@ void AssetManager::LoadSync(AssetType type, const std::string& str, uint32_t loa
         case VOICE_FILE_ASSET:
             LoadSync<VoiceFile>(str, load_flags, hold_load_mask);
             break;
-        // TODO: readd and implement properly
-        // case ANIMATION_EFFECT_ASSET:
-        //     LoadSync<AnimationEffect>(str, load_flags, hold_load_mask);
-        //     break;
         case SOUND_GROUP_INFO_ASSET:
             LoadSync<SoundGroupInfo>(str, load_flags, hold_load_mask);
             break;

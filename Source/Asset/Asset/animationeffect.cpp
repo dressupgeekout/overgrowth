@@ -133,9 +133,6 @@ bool AnimationEffectReader::valid() {
 void AnimationEffectReader::AttachTo(const AnimationEffectRef& _ae_ref) {
     ae_ref = _ae_ref;
     time = 0.0f;
-    // if (clip) {
-    //     Dispose();
-    // }
     use_theora = !ae_ref->video_path.empty();
 }
 
@@ -143,22 +140,6 @@ TextureRef& AnimationEffectReader::GetTextureAssetRef() {
     // int frame = (int)(time * ae_ref->frame_rate)%((int)ae_ref->frames.size());
     // return ae_ref->frames[frame];
 
-    // if (!clip && use_theora) {
-    //     clip_mem = new TheoraMemoryFileDataSource(ae_ref->video_path);
-    //     TheoraVideoManager* mgr = Engine::Instance()->GetAnimationEffectSystem()->mgr;
-    //     clip = mgr->createVideoClip(clip_mem, TH_BGRA);
-    //     clip->setAutoRestart(0);
-    //     clip_tex = Textures::Instance()->makeTextureColor(
-    //         clip->getWidth(), clip->getHeight(), GL_RGBA, GL_RGBA, 0.0f, 0.0f, 0.0f, 0.0f, false);
-    //     Textures::Instance()->SetTextureName(clip_tex, "Animation Effect Clip");
-    // }
-
-    // TheoraVideoFrame* f = clip->getNextFrame();
-    // if (f) {
-    //     Textures::Instance()->bindTexture(clip_tex);
-    //     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, clip->getWidth(), f->getHeight(), GL_BGRA, GL_UNSIGNED_BYTE, f->getBuffer());
-    //     clip->popFrame();
-    // }
     return clip_tex;
 }
 
@@ -177,17 +158,9 @@ AnimationEffectReader::AnimationEffectReader(const AnimationEffectReader& other)
 
 void AnimationEffectReader::Dispose() {
     if (use_theora) {
-        // Engine::Instance()->GetAnimationEffectSystem()->mgr->destroyVideoClip(clip);
-        // if (clip_mem) {
-        //     delete clip_mem;
-        //     clip_mem = NULL;
-        // }
     }
 }
 
 bool AnimationEffectReader::Done() {
-    // if (clip) {
-    //     return clip->isDone();
-    // }
     return false;
 }
