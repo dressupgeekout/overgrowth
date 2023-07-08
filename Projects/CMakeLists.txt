@@ -53,15 +53,9 @@ OPTION(MONITOR_MEMORY "Monitor memory usage and make avaiable ingame" Off)
 OPTION(OPEN_CONSOLE "Open a console on startup on windows" On)
 OPTION(FORCE_OPENGL_ERROR_CHECKING "Force OpenGL error checking in Release" Off)
 OPTION(DEPLOY "Set the codebase to compile for Deploy, this means compiling for final release to end-user, in practice, by setting the _DEPLOY define it activates a working directory change on start to force it to be the path of the binary. It also impacts some error messages. This is automatically turned on if BUILD_SERVER is On" Off)
-OPTION(ENABLE_STEAMWORKS "Build with Steamworks Support" Off)
 SET(AUX_DATA "" CACHE PATH "Auxiliary Data sourced path, used when using a Data folder from an additional path, like an already installed version of the game")
 
-IF(ENABLE_STEAMWORKS)
-    ADD_DEFINITIONS(-DENABLE_STEAMWORKS=1)
-    ADD_DEFINITIONS(-DUSE_STEAM_NETWORK_FRAMEWORK)
-ELSE()
-    ADD_DEFINITIONS(-DUSE_BASIC_NETWORK_FRAMEWORK)
-ENDIF()
+ADD_DEFINITIONS(-DUSE_BASIC_NETWORK_FRAMEWORK)
 
 IF(GPU_MARKERS)
     IF(APPLE)
@@ -453,12 +447,6 @@ IF(LINUX)
             "${CMAKE_BINARY_DIR}/breakpad-prefix/src/breakpad-build/src/client/linux/"
         )
     ENDIF()
-
-    IF(ENABLE_STEAMWORKS)
-        LINK_DIRECTORIES( 
-            "${PLIBDIR}/steamworks_1.51/sdk/redistributable_bin/${LINUX_LIB_DIR}"
-        )
-    ENDIF()
 ENDIF()
 
 IF(WIN32)
@@ -496,12 +484,6 @@ IF(APPLE)
         ${LIBDIR}/libogg-1.3.3/lib/mac64
         ${LIBDIR}/libvorbis-1.3.6/lib/mac64
     )
-
-    IF(ENABLE_STEAMWORKS)
-        LINK_DIRECTORIES(
-            ${PLIBDIR}/steamworks_1.51/sdk/redistributable_bin/osx
-        )
-    ENDIF()
 
     FIND_LIBRARY(SDL_FRAMEWORK SDL2 PATHS ${LIBDIR}/SDL2-2.0.20 NO_DEFAULT_PATH)
     FIND_LIBRARY(SDL2NET_FRAMEWORK SDL2_net PATHS ${LIBDIR}/SDL2_net-2.0.1 NO_DEFAULT_PATH)
@@ -566,11 +548,7 @@ INCLUDE_DIRECTORIES(
     ${LIBDIR}/freetype-2.12.1/include
 )
 
-IF(ENABLE_STEAMWORKS)
-    INCLUDE_DIRECTORIES(
-        ${PLIBDIR}/steamworks_1.51/sdk/public/steam
-    )
-ELSEIF(ENABLE_GAMENETWORKINGSOCKETS)
+IF(ENABLE_GAMENETWORKINGSOCKETS)
     INCLUDE_DIRECTORIES(
         ${LIBDIR}/GameNetworkingSockets-1.4.0/include/steam
     )
@@ -1211,13 +1189,10 @@ IF(BUILD_OVERGROWTH)
     target_add_grouped_source(Overgrowth JSON)
     target_add_grouped_source(Overgrowth Memory)
     target_add_grouped_source(Overgrowth Network)
-    #In the future, this should only be activated if we're building for the steam target
-    target_add_grouped_source(Overgrowth Network/Steam)
     target_add_grouped_source(Overgrowth Network/Basic)
     target_add_grouped_source(Overgrowth Utility)
     target_add_grouped_source(Overgrowth Wrappers)
     target_add_grouped_source(Overgrowth Timing)
-    target_add_grouped_source(Overgrowth Steam)
     target_add_grouped_source(Overgrowth Online)
     target_add_grouped_source(Overgrowth Online/Message)
 
@@ -1250,17 +1225,10 @@ IF(BUILD_OVERGROWTH)
             )
         endfunction(CopyDLL)
         
-        CopyDLL("${CMAKE_SOURCE_DIR}/steam_appid.txt" "")
         CopyDLL("${LIBDIR}/SDL2-2.0.20/lib/${WINDOWS_LIB_DIR}/SDL2.dll" "")
         CopyDLL("${LIBDIR}/SDL2_net-2.0.1/lib/${WINDOWS_LIB_DIR}/SDL2_net.dll" "")
 
-        IF(ENABLE_STEAMWORKS)
-                if(64BIT_WINDOWS)
-                    CopyDLL("${PLIBDIR}/steamworks_1.51/sdk/redistributable_bin/win64/steam_api64.dll" "")
-                else()
-                    CopyDLL("${PLIBDIR}/steamworks_1.51/sdk/redistributable_bin/${WINDOWS_LIB_DIR}/steam_api.dll" "")
-                endif()
-            ELSEIF(ENABLE_GAMENETWORKINGSOCKETS)
+        IF(ENABLE_GAMENETWORKINGSOCKETS)
                 CopyDLL("${LIBDIR}/GameNetworkingSockets-1.4.0/win64_bin/GameNetworkingSockets.dll" "")
                 CopyDLL("${LIBDIR}/protobuf/win64_bin/libprotobuf.dll" "")
                 CopyDLL("${LIBDIR}/protobuf/win64_bin/libprotoc.dll" "")
@@ -1387,11 +1355,6 @@ IF(BUILD_OVERGROWTH)
     )
 
     IF(WIN32)
-        IF(64BIT_WINDOWS)
-            SET(STEAM_LIB_PATH "${PLIBDIR}/steamworks_1.51/sdk/redistributable_bin/win64/steam_api64.lib")
-        ELSE()
-            SET(STEAM_LIB_PATH "${PLIBDIR}/steamworks_1.51/sdk/redistributable_bin/${WINDOWS_LIB_DIR}/steam_api.lib")
-        ENDIF()
         TARGET_LINK_LIBRARIES(Overgrowth
             openal32
             opengl32
@@ -1405,11 +1368,7 @@ IF(BUILD_OVERGROWTH)
             nvToolsExt32_1
         )
         
-        IF(ENABLE_STEAMWORKS)
-            TARGET_LINK_LIBRARIES(Overgrowth
-                ${STEAM_LIB_PATH}
-            )
-	ELSEIF(ENABLE_GAMENETWORKINGSOCKETS)
+	IF(ENABLE_GAMENETWORKINGSOCKETS)
 	    TARGET_LINK_LIBRARIES(Overgrowth
 		${LIBDIR}/GameNetworkingSockets-1.4.0/win64_lib/GameNetworkingSockets.lib
 		${LIBDIR}/protobuf/win64_lib/libprotobuf.lib
@@ -1459,12 +1418,6 @@ IF(BUILD_OVERGROWTH)
             ${BULLET_LIBRARIES}
         )
 
-	IF(ENABLE_STEAMWORKS)
-            TARGET_LINK_LIBRARIES(Overgrowth
-		    steam_api
-	    )
-	ENDIF()
-
         IF(BREAKPAD)
             TARGET_LINK_LIBRARIES(Overgrowth
                 breakpad_client
@@ -1484,12 +1437,7 @@ IF(BUILD_OVERGROWTH)
             vorbisfile
             bz2
         )
-	IF(ENABLE_STEAMWORKS)
-            TARGET_LINK_LIBRARIES(Overgrowth
-		    steam_api
-	    )
-	ENDIF()
-            
+
         SET_TARGET_PROPERTIES(Overgrowth PROPERTIES LINK_FLAGS "-F${LIBDIR}/libogg-1.3.3/include")
         SET_TARGET_PROPERTIES(Overgrowth PROPERTIES LINK_FLAGS "-F${LIBDIR}/libvorbis-1.3.6/include")
         #SET_TARGET_PROPERTIES(Overgrowth PROPERTIES LINK_FLAGS "-F${CMAKE_SOURCE_DIR}/../MacInterfaces")
@@ -1537,15 +1485,9 @@ IF(APPLE)
     CopyFileToBundle("$<TARGET_FILE:OvergrowthWorker>" "MacOS/${OVERGROWTH_WORKER_OUTPUT_NAME}")
     CopyFileToBundle("${CMAKE_SOURCE_DIR}/lugaru2.icns" "Resources/lugaru2.icns")
     CopyFileToBundle("${CMAKE_SOURCE_DIR}/FinalInfo.plist" "Info.plist")
-    CopyFileToBundle("${CMAKE_SOURCE_DIR}/steam_appid.txt" "MacOS/steam_appid.txt")
-
-    IF(ENABLE_STEAMWORKS)
-        CopyFileToBundle("${PLIBDIR}/steamworks_1.51/sdk/redistributable_bin/osx/libsteam_api.dylib" "MacOS/libsteam_api.dylib")
-    ENDIF()
 
     #CopyFileToBundle("${PLIBDIR}/Telemetry2SDKMac_20P3/redist/libTelemetryMacX86.dylib" "MacOS/libTelemetryMacX86.dylib")
         
-    CopyFileToBundle("${CMAKE_SOURCE_DIR}/steam_appid.txt" "Resources/steam_appid.txt")
     CopyFolderToBundle("${LIBDIR}/SDL2-2.0.20/SDL2.framework" "Frameworks/SDL2.framework")
     CopyFolderToBundle("${LIBDIR}/SDL2_net-2.0.1/SDL2_net.framework" "Frameworks/SDL2_net.framework")
 ENDIF()

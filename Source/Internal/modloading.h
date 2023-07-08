@@ -28,14 +28,12 @@
 
 #include <XML/Parsers/activemodsparser.h>
 #include <Utility/fixed_string.h>
-#include <Steam/ugc_id.h>
 
 #include <vector>
 #include <string>
 #include <iostream>
 #include <set>
 
-class SteamworksUGCItem;
 class TiXmlElement;
 
 enum class ModVisibilityOptions {
@@ -45,13 +43,6 @@ enum class ModVisibilityOptions {
 };
 
 static const char* mod_visibility_options[] = {"Public", "Friends", "Private"};
-
-#if ENABLE_STEAMWORKS
-const ERemoteStoragePublishedFileVisibility mod_visibility_map[] = {k_ERemoteStoragePublishedFileVisibilityPublic,
-                                                                    k_ERemoteStoragePublishedFileVisibilityFriendsOnly,
-                                                                    k_ERemoteStoragePublishedFileVisibilityPrivate};
-static char edit_tags_field[k_cchTagListMax] = "";
-#endif
 
 const int update_to_visibilty_options_count = sizeof(mod_visibility_options) / sizeof(mod_visibility_options[0]);
 
@@ -460,10 +451,6 @@ class ModLoading {
     void InitMods();
     void DetectMods();
     void Reload();
-
-#if ENABLE_STEAMWORKS
-    ModID CreateSteamworksMod(UGCID steamworks_id);
-#endif
 
     void RegisterCallback(ModLoadingCallback* callback);
     void DeRegisterCallback(ModLoadingCallback* callback);
