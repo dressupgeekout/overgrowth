@@ -220,35 +220,6 @@ void BulletWorld::Update(float timestep) {
 std::map<void *, std::set<void *> > &BulletWorld::GetCollisions() {
     PROFILER_ZONE(g_profiler_ctx, "BulletWorld::GetCollisions()");
     collision_report_.clear();
-    if (false) {
-        // PROFILER_ZONE(g_profiler_ctx, "performDiscreteCollisionDetection");
-        // dynamics_world_->performDiscreteCollisionDetection();
-        PROFILER_ENTER(g_profiler_ctx, "getDispatchInfo");
-        btDispatcherInfo &dispatchInfo = dynamics_world_->getDispatchInfo();
-        PROFILER_LEAVE(g_profiler_ctx);
-
-        dynamics_world_->setForceUpdateAllAabbs(true);
-
-        PROFILER_ENTER(g_profiler_ctx, "updateAabbs");
-        dynamics_world_->updateAabbs();
-        PROFILER_LEAVE(g_profiler_ctx);
-
-        PROFILER_ENTER(g_profiler_ctx, "computeOverlappingPairs");
-        dynamics_world_->computeOverlappingPairs();
-        PROFILER_LEAVE(g_profiler_ctx);
-
-        PROFILER_ENTER(g_profiler_ctx, "getDispatcher");
-        btDispatcher *dispatcher = dynamics_world_->getDispatcher();
-        PROFILER_LEAVE(g_profiler_ctx);
-        {
-            BT_PROFILE("dispatchAllCollisionPairs");
-            if (dispatcher) {
-                PROFILER_ENTER(g_profiler_ctx, "dispatchAllCollisionPairs");
-                dispatcher->dispatchAllCollisionPairs(dynamics_world_->m_broadphasePairCache->getOverlappingPairCache(), dispatchInfo, dynamics_world_->m_dispatcher1);
-                PROFILER_LEAVE(g_profiler_ctx);
-            }
-        }
-    }
 
     PROFILER_ENTER(g_profiler_ctx, "stepSimulation");
     dynamics_world_->stepSimulation(1, 1, (btScalar)0.000001);

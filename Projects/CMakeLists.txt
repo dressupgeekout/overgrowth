@@ -272,6 +272,7 @@ IF(NETBSD)
     PKG_CHECK_MODULES(OPENAL REQUIRED openal)
     PKG_CHECK_MODULES(FREETYPE REQUIRED freetype2)
     PKG_CHECK_MODULES(LIBPNG REQUIRED libpng)
+    PKG_CHECK_MODULES(BULLET REQUIRED bullet)
 ENDIF()
 
 SET(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
@@ -304,7 +305,6 @@ IF(BUILD_OVERGROWTH)
     # enable USE_MSVC_RUNTIME_LIBRARY_DLL
     SET(USE_MSVC_RUNTIME_LIBRARY_DLL ON CACHE BOOL "Use MSVC Runtime Library DLL (/MD or /MDd)")
     SET(USE_GLUT OFF CACHE BOOL "Use Glut")
-    ADD_SUBDIRECTORY(bullet3-2.89 bullet3-2.89)
     ADD_SUBDIRECTORY(angelscript_2_32_0_sdk/angelscript/projects/cmake angelscript_2_32_0_sdk)
 
     #Put subprojects in the "Support" folder
@@ -315,28 +315,6 @@ IF(BUILD_OVERGROWTH)
     SET_PROPERTY(TARGET triangle PROPERTY FOLDER "Support")
     SET_PROPERTY(TARGET minizip PROPERTY FOLDER "Support")
     SET_PROPERTY(TARGET glad PROPERTY FOLDER "Support")
-    SET_PROPERTY(TARGET BulletCollision PROPERTY FOLDER "Support/BulletPhysics")
-    SET_PROPERTY(TARGET BulletDynamics PROPERTY FOLDER "Support/BulletPhysics")
-    SET_PROPERTY(TARGET BulletFileLoader PROPERTY FOLDER "Support/BulletPhysics")
-    SET_PROPERTY(TARGET BulletSoftBody PROPERTY FOLDER "Support/BulletPhysics")
-    SET_PROPERTY(TARGET BulletWorldImporter PROPERTY FOLDER "Support/BulletPhysics")
-    SET_PROPERTY(TARGET BulletXmlWorldImporter PROPERTY FOLDER "Support/BulletPhysics")
-    SET_PROPERTY(TARGET ConvexDecomposition PROPERTY FOLDER "Support/BulletPhysics")
-    SET_PROPERTY(TARGET GIMPACTUtils PROPERTY FOLDER "Support/BulletPhysics")
-    SET_PROPERTY(TARGET HACD PROPERTY FOLDER "Support/BulletPhysics")
-    SET_PROPERTY(TARGET LinearMath PROPERTY FOLDER "Support/BulletPhysics")
-    IF(WIN32)
- 	    SET_PROPERTY(TARGET App_obj2sdf PROPERTY FOLDER "Support/BulletPhysics")
-	    SET_PROPERTY(TARGET Bullet2FileLoader PROPERTY FOLDER "Support/BulletPhysics")
-        SET_PROPERTY(TARGET Bullet3Collision PROPERTY FOLDER "Support/BulletPhysics")
-        SET_PROPERTY(TARGET Bullet3Common PROPERTY FOLDER "Support/BulletPhysics")
-        SET_PROPERTY(TARGET Bullet3Dynamics PROPERTY FOLDER "Support/BulletPhysics")
-        SET_PROPERTY(TARGET Bullet3Geometry PROPERTY FOLDER "Support/BulletPhysics")
-        SET_PROPERTY(TARGET Bullet3OpenCL_clew PROPERTY FOLDER "Support/BulletPhysics")
-        SET_PROPERTY(TARGET BulletInverseDynamics PROPERTY FOLDER "Support/BulletPhysics")
-        SET_PROPERTY(TARGET BulletInverseDynamicsUtils PROPERTY FOLDER "Support/BulletPhysics")
-        SET_PROPERTY(TARGET BulletRobotics PROPERTY FOLDER "Support/BulletPhysics")
-    ENDIF()
 
     SET_PROPERTY(TARGET crnlib PROPERTY FOLDER "Support")
 
@@ -344,7 +322,6 @@ IF(BUILD_OVERGROWTH)
     SET_PROPERTY(TARGET Detour PROPERTY FOLDER "Support/Recast")
     SET_PROPERTY(TARGET DetourCrowd PROPERTY FOLDER "Support/Recast")
     SET_PROPERTY(TARGET DetourTileCache PROPERTY FOLDER "Support/Recast")
-    SET_PROPERTY(TARGET HACD PROPERTY FOLDER "Support/BulletPhysics")
 ENDIF()
 
 #Build external projects that don't have a CMakeLists file.
@@ -614,7 +591,6 @@ INCLUDE_DIRECTORIES(
     ${LIBDIR}/ovr_sdk_win_1.12.0_public/OculusSDK/LibOVR/Include
     ${LIBDIR}/openvr-master/headers
     ${LIBDIR}/glm-0.9.4.2/
-    bullet3-2.89/src
     angelscript_2_32_0_sdk/angelscript/include
     angelscript_2_32_0_sdk
     /angelscript/source
@@ -1414,16 +1390,6 @@ IF(BUILD_OVERGROWTH)
     SET_PROPERTY(TARGET minizip                 PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
     SET_PROPERTY(TARGET glad                    PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
     SET_PROPERTY(TARGET trex                    PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
-    SET_PROPERTY(TARGET BulletCollision         PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
-    SET_PROPERTY(TARGET BulletDynamics          PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
-    SET_PROPERTY(TARGET BulletFileLoader        PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
-    SET_PROPERTY(TARGET BulletSoftBody          PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
-    SET_PROPERTY(TARGET BulletWorldImporter     PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
-    SET_PROPERTY(TARGET BulletXmlWorldImporter  PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
-    SET_PROPERTY(TARGET ConvexDecomposition     PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
-    SET_PROPERTY(TARGET GIMPACTUtils            PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
-    SET_PROPERTY(TARGET HACD                    PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
-    SET_PROPERTY(TARGET LinearMath              PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
     SET_PROPERTY(TARGET crnlib                  PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
     SET_PROPERTY(TARGET OvergrowthWorker        PROPERTY COMPILE_FLAGS "${EXTERNAL_LIB_COMPILE_FLAGS}")
 
@@ -1515,6 +1481,7 @@ IF(BUILD_OVERGROWTH)
             ${LIBPNG_INCLUDE_DIRS}
             ${SDL2_INCLUDE_DIRS}
             ${SDL2NET_INCLUDE_DIRS}
+            ${BULLET_INCLUDE_DIRS}
         )
 
         TARGET_LINK_LIBRARIES(Overgrowth
@@ -1531,6 +1498,7 @@ IF(BUILD_OVERGROWTH)
             z
             ${GTK2_LDFLAGS}
             ${LIBPNG_LIBRARIES}
+            ${BULLET_LIBRARIES}
         )
 
 	IF(ENABLE_STEAMWORKS)
