@@ -41,7 +41,6 @@ SET(BUILD_ID "-1" CACHE STRING "Build ID value from automated build system")
 #Option to build with breakpad, removes some compiler warnings, so it's best to go without for normal development.
 OPTION(BREAKPAD "Build with breakpad linked into the binary and with exception handling?" OFF)
 OPTION(DO_DIST_ARCHIVE "Generate a package containing all build data relevant for final release, excluding game data." OFF)
-OPTION(BUILD_SERVER "Building on a buildserver, this means that additional steps are included which generally only occur on a build server" OFF)
 OPTION(SLIM_TIMING "Build with slim timing system activated" OFF)
 OPTION(ENABLE_RAD_TELEMETRY "Enable RAD Game Tools Telemetry Support" OFF)
 OPTION(ENABLE_GUI "Enable GUI" ON)
@@ -56,11 +55,6 @@ OPTION(FORCE_OPENGL_ERROR_CHECKING "Force OpenGL error checking in Release" Off)
 OPTION(DEPLOY "Set the codebase to compile for Deploy, this means compiling for final release to end-user, in practice, by setting the _DEPLOY define it activates a working directory change on start to force it to be the path of the binary. It also impacts some error messages. This is automatically turned on if BUILD_SERVER is On" Off)
 OPTION(ENABLE_STEAMWORKS "Build with Steamworks Support" Off)
 SET(AUX_DATA "" CACHE PATH "Auxiliary Data sourced path, used when using a Data folder from an additional path, like an already installed version of the game")
-
-#Assume we want steamworks support if we're building on the build server, until we start supporting more targets
-IF(BUILD_SERVER)
-    SET(ENABLE_STEAMWORKS ON)
-ENDIF()
 
 IF(ENABLE_STEAMWORKS)
     ADD_DEFINITIONS(-DENABLE_STEAMWORKS=1)
@@ -92,21 +86,6 @@ IF(GL_INTEL_TIMING)
     ADD_DEFINITIONS(-DINTEL_TIMING=1)
 ENDIF()
 	
-
-#Activate flags that are related to running on the build server.
-IF(BUILD_SERVER)
-    IF(MSVC_VERSION GREATER 1910)
-        SET(BREAKPAD Off)
-    ELSE()
-        SET(BREAKPAD Off)#Disable breakpad for all situations for now, build server lacks support
-    ENDIF()
-    SET(DO_DIST_ARCHIVE On)
-    SET(ENABLE_RAD_TELEMTRY OFF)
-    SET(SINGLE_SHOT_ASSERTS On)
-    SET(OPEN_CONSOLE Off)
-    SET(DEPLOY On)
-ENDIF()
-
 IF(APPLE)
     # assume built-in pthreads on MacOS
     set(CMAKE_THREAD_LIBS_INIT "-lpthread")
@@ -147,7 +126,6 @@ ELSE()
 ENDIF()
 MESSAGE(STATUS "Path: ${CMAKE_BINARY_DIR}/${WIN32_DIST_FOLDER}")
 MESSAGE(STATUS "")
-MESSAGE(STATUS "Build Server: ${BUILD_SERVER}")
 MESSAGE(STATUS "Build Ogda: ${BUILD_OGDA}")
 MESSAGE(STATUS "")
 MESSAGE(STATUS "Compiler: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
@@ -184,11 +162,6 @@ SET(OVERGROWTH_OUTPUT_NAME "Overgrowth")
 SET(OVERGROWTH_WORKER_OUTPUT_NAME "OvergrowthWorker")
 
 IF(APPLE)
-    IF(BUILD_SERVER)
-        SET(CMAKE_OSX_DEPLOYMENT_TARGET "10.9")
-        SET(CMAKE_OSX_ARCHITECTURES "x86_64")
-        SET(ARCH_OUT "x86_64")
-    ENDIF()
     SET(OS_OUT "MacOSX")
     IF( "${CMAKE_GENERATOR}" STREQUAL "Xcode" )
         SET(CMAKE_OSX_SYSROOT "macosx")
@@ -406,13 +379,6 @@ IF(WIN32)
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /debug")
     set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
     set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO}")
-
-    IF(BUILD_SERVER)
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL")
-        set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /GL")
-        set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG")
-        set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} /LTCG")
-    ENDIF()
 ENDIF()
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DOG_DEBUG")
@@ -455,14 +421,6 @@ ENDIF()
 IF(LINUX)
     SET(BIN_RPATH "\$ORIGIN/${LIB_SUFFIX}")
     SET(LIB_ROOT ${LIBDIR}/Linux/${LIB_SUFFIX})
-
-    #Only use the built in library folder if we are on the build server and using the 
-    #steam runtime environment.
-    IF(BUILD_SERVER) 
-        LINK_DIRECTORIES(
-            ${LIB_ROOT}
-        )
-    ENDIF()
 
     # Don't use -rpath.
     SET(CMAKE_SKIP_BUILD_RPATH TRUE)
